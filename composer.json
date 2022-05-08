@@ -1,0 +1,20 @@
+{
+    "name": "twoquakers/nutshell",
+    "description": "Simple Cms for Peanut",
+    "minimum-stability": "stable",
+    "license": "GPL-3.0+",
+    "type": "project",
+    "require": {
+        "phpunit/phpunit": "^9.5",
+        "phpmailer/phpmailer": "^6.6",
+        "ext-pdo": "*",
+        "ext-json": "*",
+      "ext-simplexml": "*"
+    },
+    "authors": [
+        {
+            "name": "Terry SoRelle",
+            "email": "tls@2quakers.net"
+        }
+    ]
+}
