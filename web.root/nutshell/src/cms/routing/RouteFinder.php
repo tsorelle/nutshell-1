@@ -31,7 +31,7 @@ class RouteFinder
                         $pathCount = count($pathParts);
                         $argCount = $pathCount - $matchCount;
                         if ($argCount > 0) {
-                            $argValues = array_splice($pathParts, $pathCount);
+                            $argValues = array_splice($pathParts, $matchCount);
                         }
                     }
 

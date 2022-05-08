@@ -100,9 +100,14 @@ namespace Peanut {
             this.vmName = name;
             this.vmContextId = context;
             // let sharedContext = jQuery('#peanut-vm-context').val();
-            let sharedContext = (<HTMLInputElement> document.getElementById('#peanut-vm-context'));
-            this.vmContext = (sharedContext) ? context + '&' + sharedContext.value : context;
+            let sharedContext = this.getPageVarialble('peanut-vm-context');
+            this.vmContext = (sharedContext) ? context + '&' + sharedContext : context;
         };
+
+        public getPageVarialble(id: string)  {
+            let input = (<HTMLInputElement> document.getElementById('tester'));
+            return input ? input.value : null;
+        }
 
         public getVmContextId = () => {
             return this.vmContextId;

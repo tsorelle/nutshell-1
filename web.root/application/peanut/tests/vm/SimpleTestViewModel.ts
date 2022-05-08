@@ -20,8 +20,10 @@ namespace Peanut {
             successFunction();
         }
 
+
         onShowError = () => {
-            this.application.showError('This is an error.');
+            this.application.showMessage('This is an error.');
+           //  this.application.showError('This is an error.');
         };
     }
 }

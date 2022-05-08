@@ -25,9 +25,11 @@ class helloWorldCommand extends \Tops\services\TServiceCommand
             $this->addErrorMessage('Tester name not received.');
             return;
         }
+
+        // todo: infomessage not displayed
         $this->addInfoMessage('Hello World from: '.$request->tester);
         $responseValue = new \stdClass();
-        $responseValue->message = "Greatings earthlings.";
+        $responseValue->message = "Greatings earthlings from ".$request->tester;
         $responseValue->translations =  array(
             'hello' => 'Hola',
             'world' => 'Mundo'

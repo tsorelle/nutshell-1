@@ -22,16 +22,17 @@ namespace Peanut {
 
         onService = () => {
             let me = this;
-            let request = {"tester" : 'Terry SoRelle'};
+            let testerName = this.getPageVarialble('tester');
             me.application.hideServiceMessages();
             // me.application.showWaiter('Testing service...','spin-waiter');
             // me.application.showWaiter('Testing service...');
             // me.services.executeService('admin.HelloWorld', request,
+            let request = {"tester" : testerName};
             me.services.executeService('PeanutTest::HelloWorld', request,
                 function (serviceResponse: Peanut.IServiceResponse) {
                     if (serviceResponse.Result == Peanut.serviceResultSuccess) {
                         let response = serviceResponse.Value;
-                        alert(response.message);
+                        // alert(response.message);
                         // me.addTranslations(response.translations);
                         // me.languageA(me.translate('hello','Hello'));
                         // me.languageB(me.translate('world'));

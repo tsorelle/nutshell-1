@@ -179,7 +179,8 @@ namespace Peanut {
                 clearInterval(me.messageTimer);
             }
             MessageManager.instance.setServiceMessages(messages);
-            let intervalValue = 2500;
+            // let intervalValue = 2500;
+            let intervalValue = 10000;
             for(let i= 0;i<messages.length;i++) {
                 if (messages[0].MessageType != Peanut.infoMessageType) {
                     intervalValue = 15000;
