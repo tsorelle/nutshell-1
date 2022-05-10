@@ -3,6 +3,8 @@ if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 70209) {
     die("Nutshell requires PHP 7.2.9 to run.\nYou are running PHP " . PHP_VERSION . "\n");
 }
 error_reporting(E_ALL & ~E_NOTICE);
+session_set_cookie_params(604800);
+session_start();
 require 'nutshell/bootstrap/configure.php';
 require 'nutshell/src/cms/routing/RouteFinder.php';
 if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI'])) {
