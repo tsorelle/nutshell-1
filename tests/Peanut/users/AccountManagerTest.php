@@ -7,103 +7,131 @@ use PHPUnit\Framework\TestCase;
 class AccountManagerTest extends TestCase
 {
 
-    public function testGetRoleIdForName()
-    {
-
-    }
-
     public function testSetAdminAccount()
     {
+        $password = 'Banj0Boy';
+        $manager = new AccountManager();
+        $manager->setAdminAccount($password);
+        $account = $manager->getUserData('admin');
+        $this->assertNotEmpty($account);
+        $actual = password_verify($password,$account->password);
+        $this->assertTrue($actual);
 
     }
 
-    public function testGetAccountIdForUsername()
-    {
-
-    }
-
-    public function testAuthenticateUser()
-    {
-
-    }
-
-    public function testAddUserRole()
-    {
-
-    }
-
-    public function testRemoveUserRole()
-    {
-
-    }
-
+    /**
+     * @return void
+     *
+     * Tests addRole, getRoleIdForName, removeRole
+     */
     public function testAddRole()
     {
         $manager = new AccountManager();
-        $manager->addRole('administrators','System Admins','test');
-        $roleId = $manager->getRoleIdForName('administrators');
+        $manager->addRole('clowns','Payasos','test');
+        $roleId = $manager->getRoleIdForName('clowns');
         $this->assertNotEmpty($roleId);
+        $manager->removeRole('clowns');
+        $roleId = $manager->getRoleIdForName('clowns');
+        $this->assertEmpty($roleId);
 
     }
 
-    public function testGetCurrentSignedInUser()
-    {
 
-    }
-
-    public function testRemoveRole()
-    {
-
-    }
-
-    public function testSignOut()
-    {
-
-    }
-
+    /**
+     * @return void
+     * Tests addAccount, getUserData,addRole, addUserRoles, getUserRoles,
+     *  getUserRoleNames, getUsersInRole and removeAccount
+     */
     public function testAddAccount()
     {
+        $password = 'password';
+        $manager = new AccountManager();
+        $manager->addAccount('testuser',$password);
+        $account = $manager->getUserData('testuser');
+        $this->assertNotEmpty($account);
+        $expected = 'testuser';
+        $actual = $account->username;
+        $this->assertEquals($expected,$actual);
+        $actual = password_verify($password,$account->password);
+        $this->assertTrue($actual);
+        $manager->addRole('Clowns','test');
+        $manager->addRole('Jugglers','test');
 
-    }
+        $manager->addUserRoles($account->id,['Clowns','Jugglers']);
+        $uroles = $manager->getUserRoles($account->id);
+        $urolecount = count($uroles);
+        $uroles = $manager->getUserRoleNames($account->id);
+        $this->assertEquals($urolecount,count($uroles));
+        $clowns = in_array('Clowns',$uroles);
+        $this->assertTrue($clowns);
+        $jugs = in_array('Jugglers',$uroles);
+        $this->assertTrue($jugs);
 
-    public function testGetUserRoleNames()
-    {
+        $users = $manager->getUsersInRole('Clowns');
+        $this->assertNotEmpty($users);
+        $user = $users[0];
+        $this->assertEquals($account->id,$user->id);
 
-    }
-
-    public function testGetUsersInRole()
-    {
-
-    }
-
-    public function testGetUserRoles()
-    {
-
-    }
-
-    public function testAddUserRoles()
-    {
-
-    }
-
-    public function testRemoveAccount()
-    {
-
+        $manager->removeAccount($account->id);
+        $account = $manager->getUserData('testuser');
+        $this->assertEmpty($account);
     }
 
     public function testAddRoleForUserId()
     {
+        $password = 'password';
+        $username = 'testuser';
+        $manager = new AccountManager();
+        $manager->addAccount('testuser',$password);
+        $account = $manager->getUserData('testuser');
+        $manager->addRole('Clowns','test');
+        $manager->addRoleForUserId($account->id,'Clowns');
+        $roles = $manager->getUserRoleNames('testuser');
+        $actual = in_array('Clowns',$roles);
+        $this->assertTrue($actual);
+        $manager->removeAccount($username);
+        $manager->removeRole('Clowns');
+
 
     }
 
     public function testChangePassword()
     {
+        $password = 'password';
+        $newpwd = 'newpassword';
+
+        $manager = new AccountManager();
+        $manager->addAccount('testuser',$password);
+        $manager->changePassword('testuser',$newpwd);
+        $user = $manager->getUserData('testuser');
+        $result = password_verify($newpwd,$user->password);
+        $this->assertTrue($result);
+        $manager->removeAccount($user->id);
 
     }
 
     public function testSignIn()
     {
+        $password = 'password';
+        $username = 'testuser';
+        $manager = new AccountManager();
+        $manager->addAccount('testuser',$password);
+        $account = $manager->getUserData('testuser');
 
+        $signinResult = $manager->signIn($username,$password);
+        $success = $signinResult !== false;
+        $result = $success ? '' : $signinResult;
+        $this->assertTrue($success,$result);
+
+        $current = $manager->getCurrentSignedInUser();
+        $success = $current !== false;
+        $this->assertTrue($success);
+        $this->assertEquals($current->id,$account->id);
+        $manager->signOut();
+        $current = $manager->getCurrentSignedInUser();
+        $this->assertEmpty($current);
+
+        $manager->removeAccount($username);
     }
 
     public function testGetProfileValues()
@@ -116,8 +144,4 @@ class AccountManagerTest extends TestCase
 
     }
 
-    public function testGetUserData()
-    {
-
-    }
 }

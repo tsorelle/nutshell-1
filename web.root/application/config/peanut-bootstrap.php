@@ -70,9 +70,20 @@ class Bootstrap
         if (!empty($packages)) {
             $packagePath = ViewModelManager::getPackagePath();
             foreach ($packages as $package) {
-                $namespace = TStrings::toCamelCase($package);
+                $namespace = null;
+                $iniPath = $fileRoot.$packagePath."/$package/package.ini";
+                if (file_exists($iniPath)) {
+                    $ini = parse_ini_file($iniPath, false);
+                    if (isset($ini['namespace'])) {
+                        $namespace = $ini['namespace'];
+                    }
+                }
+
+                if (!$namespace) {
+                    $namespace = 'Peanut\\'.TStrings::toCamelCase($package);
+                }
                 $srcRoot = $fileRoot.$packagePath."/$package/src";
-                $loader->addPsr4('Peanut\\'.$namespace.'\\', $srcRoot);
+                $loader->addPsr4($namespace.'\\', $srcRoot);
             }
         }
 

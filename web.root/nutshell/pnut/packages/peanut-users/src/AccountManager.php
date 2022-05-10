@@ -102,6 +102,8 @@ class AccountManager implements IUserAccountManager
         $user->password = $password;
         $user->username = $username;
         $user->personId = $personId;
+        $user->active = 1;
+        $user->registrationtime = time();
         $userId = $this->getUsersRepository()->insert($user,$creator);
         $result->invalidRoles = $this->addUserRoles($userId,$roles);
 
@@ -200,6 +202,8 @@ class AccountManager implements IUserAccountManager
         if ($user === false) {
             return false;
         }
+        // todo: clear contact reference
+        $this->getUserRolesAssociation()->removeAllRight($user->id);
         return $this->getUsersRepository()->delete($user->id);
     }
 
@@ -220,8 +224,14 @@ class AccountManager implements IUserAccountManager
 
     public function authenticateUser($username,$pwd) {
         $username = trim($username);
-        $password = password_hash(trim($pwd),PASSWORD_DEFAULT);
-        return $this->getUsersRepository()->getAuthenticUser($username,$pwd);
+        $user = $this->getUserData($username);
+        if (!$user) {
+            return false;
+        }
+        if (password_verify($pwd,$user->password)) {
+            return $user;
+        }
+        return false;
     }
 
     public function signIn($username,$pwd) {
@@ -235,20 +245,7 @@ class AccountManager implements IUserAccountManager
         if (!$sessionId) {
             return 'Session not initialized';
         }
-        $session = $sessionsRepository->getSessionBySessionId($sessionId);
-        $isNew = ($session === false);
-        if ($isNew) {
-            $session = new Usersession();
-            $session->sessionid = $sessionId;
-        }
-        $session->userId = $user->id;
-        $session->signedin = strtotime('now');
-        if ($isNew) {
-            $sessionsRepository->insert($session);
-        }
-        else {
-            $sessionsRepository->update($session);
-        }
+        $sessionsRepository->newSession($sessionId,$user->id);
         return $user;
     }
 
@@ -280,8 +277,9 @@ class AccountManager implements IUserAccountManager
         if (!$id) {
             return false;
         }
-        $roles = $this->getUserRolesAssociation()->getRightValues($id,'name');
+        return $this->getUserRolesAssociation()->getRightValues($id,'name');
     }
+
     public function getUserRoles($usr) {
         $id = $this->getAccountIdForUsername($usr);
         if (!$id) {
@@ -303,7 +301,8 @@ class AccountManager implements IUserAccountManager
         if (!$roleId) {
             return 'Role not found';
         }
-        $this->getUserRolesAssociation()->addAssociationLeft($userId,$roleId);
+        // $this->getUserRolesAssociation()->addAssociationLeft($userId,$roleId);
+        $this->getUserRolesAssociation()->addAssociationRight($userId,$roleId);
         return true;
     }
 
@@ -329,7 +328,8 @@ class AccountManager implements IUserAccountManager
         if (!$roleId) {
             return 'Role not found';
         }
-        $this->getUserRolesAssociation()->removeAssociationLeft($userId,$roleId);
+        // $this->getUserRolesAssociation()->removeAssociationLeft($userId,$roleId);
+        $this->getUserRolesAssociation()->removeAssociationRight($userId,$roleId);
         return true;
     }
 
@@ -342,6 +342,7 @@ class AccountManager implements IUserAccountManager
         $role = new Role();
         $role->name = $roleName;
         $role->description = $description;
+        $role->active = 1;
         return $repository->insert($role,$createdBy);
 
     }

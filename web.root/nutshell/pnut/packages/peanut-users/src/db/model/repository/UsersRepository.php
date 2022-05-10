@@ -15,16 +15,6 @@ use Tops\sys\TConfiguration;
 
 class UsersRepository extends \Tops\db\TEntityRepository
 {
-    /**
-     * @param string $username
-     * @param $pwd
-     * @return mixed|User
-     */
-    public function getAuthenticUser(string $username, $pwd)
-    {
-        return $this->getSingleEntity('username=? and password=?',$username,$pwd);
-    }
-
     public function setAdminAccount($password) {
         /**
          * @var $current User
@@ -36,7 +26,8 @@ class UsersRepository extends \Tops\db\TEntityRepository
         }
         else {
             $sql =
-                "INSERT INTO pnut_users (`id`,`username`,`password`,`active`,`createdby`,createdon`,`changedby`,`changedon`) ".
+                // "INSERT INTO pnut_users (`id`,`username`,`password`,`active`,`createdby`,createdon`,`changedby`,`changedon`) ".
+                "INSERT INTO pnut_users (`id`,`username`,`password`,`active`,`createdby`,`changedby`) ".
                 " VALUES (1,'admin',?,1,'system','system')";
 
             $this->executeStatement($sql,[$password]);

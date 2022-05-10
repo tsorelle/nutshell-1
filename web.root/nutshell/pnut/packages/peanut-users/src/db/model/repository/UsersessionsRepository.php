@@ -20,11 +20,19 @@ class UsersessionsRepository extends \Tops\db\TEntityRepository
      */
     public function getActiveSession($sessionId)
     {
-        return $this->getSingleEntity('signedin >= (NOW() - INTERVAL 7 DAY)) AND  sessionid=?',[$sessionId]);
+        return $this->getSingleEntity('signedin >= (NOW() - INTERVAL 7 DAY) AND  sessionid=?',[$sessionId]);
     }
 
     public function getSessionBySessionId($sessionId) {
         return $this->getSingleEntity('sessionid=?',[$sessionId]);
+    }
+
+    public function newSession($sessionId, $userId)
+    {
+        $sql = 'DELETE FROM '.$this->getTableName().' WHERE signedin >= (NOW() - INTERVAL 7 DAY) OR userId = ?';
+        $this->executeStatement($sql,[$userId]);
+        $sql = 'INSERT INTO `twoquake_nuts`.`pnut_usersessions` (sessionid,userId) VALUES (?,?)';
+        $this->executeStatement($sql,[$sessionId,$userId]);
     }
 
     protected function getTableName() {
@@ -45,5 +53,5 @@ class UsersessionsRepository extends \Tops\db\TEntityRepository
             'id'=>PDO::PARAM_INT,
             'sessionid'=>PDO::PARAM_STR,
             'userId'=>PDO::PARAM_INT,
-            'signedin'=>PDO::PARAM_STR);
+            'signedin'=>PDO::PARAM_INT);
     }}
