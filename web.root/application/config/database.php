@@ -8,7 +8,7 @@ return [
             'server' => 'localhost',
             'database' => 'scym2',
             'username' => 'scym2',
-            'password' => '#Et6aWriJ=stAku',
+            'password' =>
             'character_set' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
         ],
