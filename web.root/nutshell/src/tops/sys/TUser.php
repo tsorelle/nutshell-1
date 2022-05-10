@@ -98,9 +98,10 @@ class TUser {
         if ($requireAdmin && !self::getCurrent()->isAdmin()) {
             $response = new TAddUserAccountResponse();
             $response->errorCode = IUserAccountManager::notAuthorizedError;
+            return $response;
         }
-        $username = trim(@$username);
-        $password = trim(@$password);
+        $username = trim($username ?? '');
+        $password = trim($password ?? '');
         $email = $email === null ? null : trim(@$email);
         return self::getUserFactory()->
             createAccountManager()->

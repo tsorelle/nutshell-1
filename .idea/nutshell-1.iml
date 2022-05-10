@@ -4,8 +4,9 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/web.root/nutshell/src" isTestSource="false" packagePrefix="Nutshell" />
+      <sourceFolder url="file://$MODULE_DIR$/web.root/nutshell/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/web.root/nutshell/src/tops" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/web.root/nutshell/src/cms" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/nikic/php-parser" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/myclabs/deep-copy" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phar-io/manifest" />
