@@ -46,9 +46,10 @@ class AccountManagerTest extends TestCase
     {
         $password = 'password';
         $manager = new AccountManager();
-        $manager->addAccount('testuser',$password);
+        $addResult = $manager->addAccount('testuser',$password);
         $account = $manager->getUserData('testuser');
         $this->assertNotEmpty($account);
+        $this->assertEquals($account->id,$addResult->accountId);
         $expected = 'testuser';
         $actual = $account->username;
         $this->assertEquals($expected,$actual);
@@ -137,10 +138,43 @@ class AccountManagerTest extends TestCase
     public function testGetProfileValues()
     {
 
+        $manager = new AccountManager();
+        $name = 'Test User';
+        $username = 'testuser';
+        $email = 'test@user.com';
+        $addResult = $manager->registerSiteUser($username,'password',$name,$email);
+        $errorCode = isset($addResult->errorCode) ? $addResult->errorCode : 'no error code';
+        $this->assertTrue($errorCode === false);
+        $userId = $addResult->accountId;
+        $user = $manager->getCmsUserIdByEmail($email);
+        $this->assertNotEmpty($user);
+        $profile = $manager->getProfileValues($userId);
+        $manager->removeAccount($userId);
+        $this->assertIsArray($profile);
+        $actual = $profile['full-name'];
+        $expected = $name;
+        $this->assertEquals($expected,$actual);
+        $actual = $profile['email'];
+        $expected = $email;
+        $this->assertEquals($expected,$actual);
+
+
+
     }
 
     public function testChangeUserName()
     {
+        $password = 'password';
+        $username = 'testuser';
+        $manager = new AccountManager();
+        $manager->addAccount('testuser',$password);
+        $id = $manager->getAccountIdForUsername($username);
+        $expected = 'newusername';
+        $manager->changeUserName($id,$expected);
+        $user = $manager->getUserData($id);
+        $actual = $user->username;
+        $manager->removeAccount($id);
+        $this->assertEquals($expected,$user->username);
 
     }
 

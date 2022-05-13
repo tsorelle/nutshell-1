@@ -77,8 +77,7 @@ abstract class TAbstractUser implements IUser
 
     private function cacheProfile() {
         $cache = TUser::getProfileCache();
-        $result = $cache->Set('users.'.$this->userName,$this->profile,20);
-        return $result;
+        $cache->Set('users.'.$this->userName,$this->profile,20);
     }
 
     /**
@@ -125,6 +124,15 @@ abstract class TAbstractUser implements IUser
     public abstract function getRoles();
 
     public abstract function signIn($username, $password = null);
+
+    /**
+     * Optional override in subclass
+     * @return bool
+     */
+    public function signOut() {
+        TUser::resetCurrentUser();
+        return true;
+    }
 
     /**
      * @param $roleName

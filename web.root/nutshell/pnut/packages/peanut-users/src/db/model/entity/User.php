@@ -10,8 +10,6 @@ class User  extends \Tops\db\TimeStampedEntity
 { 
     public $id;
     public $username;
-    public $personId;
     public $password;
-    public $registrationtime;
     public $active;
 }

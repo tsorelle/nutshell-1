@@ -13,7 +13,7 @@ class UserFactory implements \Tops\sys\IUserFactory
      */
     public function createUser()
     {
-        $result = new CmsUser();
+        return new CmsUser();
 
     }
 

@@ -34,6 +34,8 @@ interface IUserAccountManager
      */
     public function addAccount($username,$password,$email=null,$roles=[],$profile=[]);
 
+    public function registerSiteUser($username,$password,$fullname, $email, $roles=[], $profile = []);
+
     public function getPasswordResetUrl();
 
     public function getLoginUrl();

@@ -11,7 +11,7 @@ namespace Tops\sys;
 
 class TAddUserAccountResponse
 {
-    public $userId = null;
+    public $accountId = null;
     public $errorCode = false;
     public $invalidRoles = [];
     public $invalidProperties = [];

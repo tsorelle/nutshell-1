@@ -103,6 +103,11 @@ interface IUser
     public function signIn($username,$password=null);
 
     /**
+     * @return bool
+     */
+    public function signOut();
+
+    /**
      * @param $newPassword
      * @return bool
      */

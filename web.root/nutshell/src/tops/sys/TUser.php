@@ -43,7 +43,6 @@ class TUser {
     const profileKeyUserName   ='username';
     const profileKeyLanguage  ='language';
 
-
     /**
      * @var IUser
      */
@@ -81,6 +80,13 @@ class TUser {
         return self::$currentUser;
     }
 
+    public static function SignOut() {
+        $user = self::getCurrent();
+        if ($user) {
+            $user->signOut();
+        }
+    }
+
     public static function SignIn($username, $password=null) {
         $user = self::Create();
         $success = $user->signIn($username,$password);
@@ -94,7 +100,7 @@ class TUser {
     /**
      * @return TAddUserAccountResponse
      */
-    public static function  addAccount($username,$password,$email=null,$roles=[],$profile=[],$requireAdmin=true) {
+    public static function  addAccount($username,$password,$fullname,$email,$roles=[],$profile=[],$requireAdmin=true) {
         if ($requireAdmin && !self::getCurrent()->isAdmin()) {
             $response = new TAddUserAccountResponse();
             $response->errorCode = IUserAccountManager::notAuthorizedError;
@@ -104,8 +110,7 @@ class TUser {
         $password = trim($password ?? '');
         $email = $email === null ? null : trim(@$email);
         return self::getUserFactory()->
-            createAccountManager()->
-            addAccount($username,$password,$email,$roles,$profile);
+            createAccountManager()->registerSiteUser($username,$password,$fullname,$email,$roles,$profile);
     }
 
     public static function getByUserName($userName)
@@ -161,7 +166,8 @@ class TUser {
      */
     public static function Create() {
 
-        return self::getUserFactory()->createUser();
+        $factory = self::getUserFactory();
+        return $factory->createUser();
 
     }
 

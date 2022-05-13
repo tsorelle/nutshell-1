@@ -9,9 +9,13 @@ use Peanut\users\db\model\repository\RolesRepository;
 use Peanut\users\db\model\repository\UserRolesAssociation;
 use Peanut\users\db\model\repository\UsersessionsRepository;
 use Peanut\users\db\model\repository\UsersRepository;
+use Tops\db\IProfilesRepository;
 use Tops\sys\IUserAccountManager;
 use Tops\sys\TAddUserAccountResponse;
 use Tops\sys\TConfiguration;
+use Tops\sys\TObjectContainer;
+
+//todo: test profile and contact related functions
 
 class AccountManager implements IUserAccountManager
 {
@@ -67,19 +71,63 @@ class AccountManager implements IUserAccountManager
     }
 
     /**
+     * @return  IProfilesRepository
+     */
+    private function getProfilesRepository() {
+        return TObjectContainer::Get('profiles.repository');
+
+    }
+
+    /**
+     * @param $username
+     * @param $password
+     * @param $fullname
+     * @param $email
+     * @param $roles
+     * @param $profile
+     * @return TAddUserAccountResponse
+     */
+    public function registerSiteUser($username,$password,$fullname, $email, $roles=[], $profile = [])
+    {
+
+        $profileRepository = $this->getProfilesRepository();
+        if ($profileRepository) {
+            $checkResult = $profileRepository->checkAvailableProfile($email,$fullname);
+            if ($checkResult === true) {
+                $profile['full-name'] = $fullname;
+                $profile['email'] = $email;
+            }
+            else {
+                return $checkResult;
+            }
+        }
+        else {
+            throw new \Exception('Profile repository not registered.');
+        }
+        $accountResult =  $this->addAccount($username,$password,$email,$roles,$profile);
+        if ($accountResult->errorCode === false && count($profile) > 0) {
+            $accountResult->errorCode = $profileRepository->insertProfileValues($profile,$accountResult->accountId);
+            if ($accountResult->errorCode) {
+                $this->removeAccount($accountResult->accountId);
+                $accountResult->accountId = null;
+            }
+        }
+        return $accountResult;
+    }
+
+    /**
      * @param $username
      * @param $password
      * @param $email (ignored)
      * @param $roles
      * @param $profile (ignored)
-     * @param $personId
      * @param $creator
      * @return bool|TAddUserAccountResponse
      *
      * Note, in this implementation, email and profile are maintained in the contact system, ignored here.
      */
     public function addAccount($username, $password, $email=null,$roles=[],$profile=[],
-                               $personId = 0, $creator='system')
+                               $creator='system')
     {
 
         $result = new TAddUserAccountResponse();
@@ -101,13 +149,16 @@ class AccountManager implements IUserAccountManager
         $user = new User();
         $user->password = $password;
         $user->username = $username;
-        $user->personId = $personId;
         $user->active = 1;
-        $user->registrationtime = time();
-        $userId = $this->getUsersRepository()->insert($user,$creator);
-        $result->invalidRoles = $this->addUserRoles($userId,$roles);
+        $accountId = $this->getUsersRepository()->insert($user,$creator);
+        $result->accountId = $accountId;
+        $result->invalidRoles = $this->addUserRoles($accountId,$roles);
 
-        return true;
+        return $result;
+    }
+
+    public function addTestAccount($username,$password) {
+
     }
 
     const minUsernameLength = 5;
@@ -197,12 +248,21 @@ class AccountManager implements IUserAccountManager
         return true;
     }
 
-    public function removeAccount($usr) {
+    public function removeAccount($usr,$removeProfile = false) {
         $user = $this->getUserData($usr);
         if ($user === false) {
             return false;
         }
-        // todo: clear contact reference
+        $profilesRepository = $this->getProfilesRepository();
+        if ($profilesRepository) {
+            if ($removeProfile) {
+                $profilesRepository->removeProfile($user->id);
+            }
+            else {
+                $profilesRepository->clearAccountId($user->id);
+            }
+        }
+
         $this->getUserRolesAssociation()->removeAllRight($user->id);
         return $this->getUsersRepository()->delete($user->id);
     }
@@ -376,8 +436,15 @@ class AccountManager implements IUserAccountManager
 
     public function getCmsUserIdByEmail($email)
     {
-        $emailTableName = TConfiguration::getValue('emailtable','mail','pnut_contacts');
-        return $this->getUsersRepository()->getUserIdByEmail($email,$emailTableName);
+        $profilesRepository = $this->getProfilesRepository();
+        $accountId = $profilesRepository->getAccountIdByEmail($email);
+        if ($accountId) {
+            $user = $this->getUsersRepository()->get($accountId);
+            if ($user) {
+                return $user->id;
+            }
+        }
+        return false;
     }
 
     public function getPasswordResetUrl()
@@ -391,11 +458,18 @@ class AccountManager implements IUserAccountManager
     }
 
     public function getProfileValues($userIdentifier) {
-        $id = $this->getAccountIdForUsername($userIdentifier);
-        if (!$id) {
+        $user = $this->getUserData($userIdentifier);
+        if (!$user) {
             return [];
         }
-        $fieldConfig = TConfiguration::getIniSection('contact-fields');
-        return $this->getUsersRepository()->getContactInfo($id,$fieldConfig);
+        $id = $user->id;
+        $profilesRepository = $this->getProfilesRepository();
+        if ($profilesRepository) {
+            return $profilesRepository->getProfileArray($id);
+        }
+
+        return [];
     }
+
+
 }

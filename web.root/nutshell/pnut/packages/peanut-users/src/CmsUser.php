@@ -3,13 +3,21 @@
 namespace Peanut\users;
 
 use Peanut\users\db\model\entity\User;
+use Tops\sys\TUser;
 
 class CmsUser extends \Tops\sys\TAbstractUser
 {
+    public static function LogOut() {
+        $user = TUser::getCurrent();
+        if ($user) {
+            $user->signOut();
+        }
+    }
+
     /**
      * @var User
      */
-    private $userData;
+    private $userInfo;
 
     /**
      * @var
@@ -27,11 +35,34 @@ class CmsUser extends \Tops\sys\TAbstractUser
     }
 
     /**
+     * @param $user  User | null
+     * @param $isCurrent
+     * @return bool
+     */
+    private function setUser($user,$isCurrent = false)
+    {
+        $this->isCurrentUser = $isCurrent;
+        if ($user == null) {
+            $this->userInfo = null;
+            $this->id = 0;
+            unset($this->userName);
+            return false;
+        }
+        $this->userInfo = $user;
+        $this->id = $user->id;
+
+        $this->userName = $user->username;
+        unset($this->roles);
+        $this->updateLanguage();
+        return true;
+    }
+
+    /**
      * @inheritDoc
      */
     public function loadById($id)
     {
-        $this->userData = $this->accountManager->getUserData($id);
+        return $this->setUser($this->accountManager->getUserData($id));
     }
 
     /**
@@ -40,7 +71,7 @@ class CmsUser extends \Tops\sys\TAbstractUser
     public function loadByEmail($email)
     {
         $id = $this->accountManager->getCmsUserIdByEmail($email);
-        $this->userData =  $this->accountManager->getUserData($id);
+        return $this->setUser($this->accountManager->getUserData($id));
     }
 
     /**
@@ -48,7 +79,15 @@ class CmsUser extends \Tops\sys\TAbstractUser
      */
     public function loadByUserName($userName)
     {
-        $this->userData = $this->accountManager->getUserData($userName);
+        $user = $this->accountManager->getUserData($userName);
+        if ($user === false) {
+            $user = null;
+        }
+        return $this->setUser($user);
+    }
+
+    private function loadUser(User $user) {
+        return $this->setUser($user);
     }
 
     /**
@@ -56,12 +95,13 @@ class CmsUser extends \Tops\sys\TAbstractUser
      */
     public function loadCurrentUser()
     {
-        $this->userData = $this->accountManager->getCurrentSignedInUser();
-        if (!$this->userData) {
-            $this->userData = new User();
-            $this->userData->username='guest';
-            $this->userData->id = false;
+        $userData = $this->accountManager->getCurrentSignedInUser();
+        if (!$userData) {
+            $userData = new User();
+            $userData->username='guest';
+            $userData->id = false;
         }
+        return $this->setUser($userData,true);
     }
 
     /**
@@ -69,22 +109,30 @@ class CmsUser extends \Tops\sys\TAbstractUser
      */
     public function isAdmin()
     {
-        if (isset($this->userData)) {
-            return ($this->userData->id == 1 || $this->isMemberOf('administrators'));
+        if (isset($this->userInfo)) {
+            if ($this->userInfo->id == 1) {
+                return true;
+            }
+            $roles = $this->getRoles();
+            if ($roles) {
+                return in_array('administrator',$roles);
+            }
         }
         return false;
     }
+
+
 
     /**
      * @inheritDoc
      */
     public function getRoles()
     {
-        if (!isset($this->userData)) {
+        if (!isset($this->userInfo)) {
             return [];
         }
         if (!isset($this->roles)) {
-            $this->roles = $this->accountManager->getUserRoles($this->userData->id);
+            $this->roles = $this->accountManager->getUserRoleNames($this->userInfo->id);
         }
         return $this->roles;
     }
@@ -94,22 +142,39 @@ class CmsUser extends \Tops\sys\TAbstractUser
         return $this->accountManager->signIn($username,$password);
     }
 
+    public function signOut() {
+        $this->userInfo = null;
+        $this->accountManager->signOut();
+        return parent::signOut();
+    }
+
+
     /**
      * @inheritDoc
      */
     public function isAuthenticated()
     {
-        return (isset($this->userData) && $this->userData->username !== 'guest');
+        return (isset($this->userInfo) && $this->userInfo->username !== 'guest');
     }
 
     protected function loadProfile()
     {
-        if (isset($this->userData) && $this->userData->id) {
-
-            $this->profile = $this->accountManager->getProfileValues($this->userData->id);
+        if (isset($this->userInfo) && $this->userInfo->id) {
+            $this->profile = $this->accountManager->getProfileValues($this->userInfo->id);
         }
         else {
             $this->profile = [];
         }
+    }
+
+    public function isMemberOf($roleName) {
+        $result = parent::isMemberOf($roleName);
+        if (!$result) {
+            $roles = $this->getRoles();
+            if ($roles) {
+                $result = in_array($roleName, $roles);
+            }
+        }
+        return $result;
     }
 }
