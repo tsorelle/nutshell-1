@@ -22,7 +22,7 @@ class SiteMap
         if ($this->xmldata === false) {
             throw new \Exception("Data file not found: ".$filePath);
         }
-        TUser::getCurrent();
+        $this->user = TUser::getCurrent();
     }
 
     public function getMenu($path='/*') {

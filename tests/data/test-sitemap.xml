@@ -1,0 +1,16 @@
+<site-map>
+	<about title='About' description='' roles=''>
+		<us title='About Us' uri='us' description='' roles='' />
+		<music title='About the Music' uri='music' description='' roles='' />
+	</about>
+	<songs title='Songs' uri='songs' description='' roles=''>
+		<cowboy	title='Cowboy Songs' uri='cowboy' description='' roles=''>
+			<tex-ritter />
+			<roy-rodgers />
+		</cowboy>
+		<blues title='Blues and African American' uri='blues' description='' roles='' />
+	</songs>
+	<instruments title='Instruments' uri='instruments' description='' roles='' />
+	<tools title='Tools' uri='tools' description='' roles='administrator' />
+	<!-- page title='' uri='' description='' roles='' / -->
+</site-map>
