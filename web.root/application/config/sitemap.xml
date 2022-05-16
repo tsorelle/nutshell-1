@@ -1,10 +1,10 @@
 <site-map>
 	<about title='About' description='' roles=''>
-		<us title='About Us' uri='us' description='' roles='' />
-		<terry title='About The Author' uri='' description='' roles='' />
-		<nutshell title='' uri='' description='' roles='' >
-			<libs title="Components" uri="" description="" roles=""/>
-			<design title="Design" uri="" description="" roles=""/>
+		<us title='About Us' description='' roles='' />
+		<terry title='About The Author' description='' roles='' />
+		<nutshell title='About Nutshell' description='' roles='' >
+			<libs title="Components" description="" roles=""/>
+			<design title="Design" description="" roles=""/>
 		</nutshell>
 	</about>
 	<!-- page title='' uri='' description='' roles='' / -->

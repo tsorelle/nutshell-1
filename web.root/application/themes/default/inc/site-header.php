@@ -1,27 +1,40 @@
 <header class="p-3 bg-light text-dark">
-    <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                <img class="" role="img" aria-label="Logo" src="\assets\img\logo.png">
-            </a>
+    <nav class="navbar navbar-expand-sm navbar-light bg-light" aria-label="Third navbar example">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Site Logo</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                <li><a href="#" class="nav-link px-2 text-secondary">Home</a></li>
-                <li><a href="#" class="nav-link px-2 text-dark">Features</a></li>
-                <li><a href="#" class="nav-link px-2 text-dark">Pricing</a></li>
-                <li><a href="#" class="nav-link px-2 text-dark">FAQs</a></li>
-                <li><a href="#" class="nav-link px-2 text-dark">About</a></li>
-            </ul>
+            <div class="collapse navbar-collapse" id="navbarsExample03">
 
-            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-                <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
-            </form>
+                <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown03">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                </ul>
 
-            <!-- div class="text-end">
-                <button type="button" class="btn btn-outline-light me-2">Login</button>
-                <button type="button" class="btn btn-warning">Sign-up</button>
-            </div -->
+                <form>
+                    <input class="form-control" type="text" placeholder="Search" aria-label="Search">
+                </form>
+            </div>
         </div>
-    </div>
+    </nav>
+
+
 </header>
 

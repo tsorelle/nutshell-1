@@ -42,16 +42,36 @@ class SiteMapTest extends TestCase
 
     public function testRenderTopNav()
     {
+        // $map = new SiteMap(DIR_TEST_DATA.'/test-sitemap.xml');
+        $map = new SiteMap();
+        $actual = $map->renderTopNav();
+        $this->assertNotEmpty($actual);
 
     }
 
     public function testRenderMenu()
     {
+        $map = new SiteMap(DIR_TEST_DATA.'/test-sitemap.xml');
+        // $map = new SiteMap();
+        $actual = $map->renderMenu('songs/cowboy','roy-rogers');
+        $this->assertNotEmpty($actual);
 
     }
 
     public function testRenderBreadcrumbs()
     {
+        $map = new SiteMap(DIR_TEST_DATA.'/test-sitemap.xml');
+        $actual = $map->renderBreadcrumbs('songs/cowboy/roy-rogers');
+        $this->assertNotEmpty($actual);
+
+        $actual = $map->renderBreadcrumbs('songs/cowboy');
+        $this->assertNotEmpty($actual);
+
+        $actual = $map->renderBreadcrumbs('songs');
+        $this->assertNotEmpty($actual);
+
+        $actual = $map->renderBreadcrumbs('');
+        $this->assertEmpty($actual);
 
     }
 }

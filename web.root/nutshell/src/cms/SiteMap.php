@@ -25,16 +25,30 @@ class SiteMap
         $this->user = TUser::getCurrent();
     }
 
+    public function getMenuItem($itemName,$path='/*') {
+/*        if (empty($path) || $path=='/*') {
+            return null;
+        }*/
+        if (empty($path) || $path=='/') {
+            $path = '/*';
+        }
+        $n = $this->xmldata->xpath($path);
+        if ($n) {
+            $root = $n[0];
+            $node = $root->$itemName ?? null;
+            if ($node) {
+                return $this->getItem($itemName,$node);
+            }
+        }
+        return null;
+    }
+
     public function getMenu($path='/*') {
         $n = $this->xmldata->xpath($path);
         $menu = [];
         foreach ($n[0] as $key => $node) {
-            $item = new \stdClass();
-            $item->name = $key;
-            foreach ($node->attributes() as $name => $value) {
-                $item->{$name} = sprintf('%s',$value);
-            }
-            if ($this->authorized($item->rolls ?? [])) {
+            $item = $this->getItem($key,$node);
+            if ($this->authorized($item->roles ?? [])) {
                 $menu[] = $item;
             }
         }
@@ -57,38 +71,153 @@ class SiteMap
         return false;
     }
 
-    public function renderMenu($path,$activeItem) {
-        $menu = $this->getMenu($path);
-        foreach ($menu as $item) {
-                // render item;
-        }
+    private function isExternal($href) {
+        return (stripos($href,'http://') === 0 || stripos($href,'https://') === 0 );
     }
 
-    public function renderTopNav($activePath) {
+    /** @noinspection HtmlUnknownTarget */
+    public function renderMenu($path,$activeItem='') {
+        $menu = $this->getMenu($path);
+        $lines = [];
+        $lines[] = '    <ul class="nav flex-column">';
+        foreach ($menu as $item) {
+            $lines[] = '      <li class="nav-item">';
+            $active = $item->name == $activeItem;
+            if ($active) {
+                $lines[] = sprintf('        <a class="nav-link disabled" href="#">%s</a>', $item->title);
+            }
+            else {
+                $description = empty($item->description) ? $item->name : $item->description;
+                $href = empty($item->uri) ? $item->name : $item->uri;
+                if ($this->isExternal($href)) {
+                    $attrs = sprintf('href="%s" target="_blank"',$href);
+                } else {
+                    $href = '/' . $path . '/' . $href;
+                    $attrs = sprintf('href="%s"',$href);
+                }
+                $lines[] = sprintf('        <a class="nav-link" '.$attrs.' title="%s">%s</a>', $description, $item->title);
+            }
+            $lines[] = '      </li>';
+        }
+        $lines[] = '    </ul>';
+        return implode("\n",$lines)."\n";
+    }
+
+    /** @noinspection HtmlUnknownTarget */
+    public function renderTopNav($activePath = '') {
         $parts = explode('/',$activePath);
         $activeItem = array_pop($parts);
         $menu = $this->getMenu();
+        $lines = [];
         foreach ($menu as $item) {
-
-        }
-    }
-
-    public function renderBreadcrumbs($activePath) {
-        $items = explode('/',$activePath);
-        $crumbs = [];
-        $path = '';
-        foreach ($crumbs as $crumb) {
-            if ($path) {
-                $path .= '/';
+            $active = $item->name == $activeItem;
+            $href = empty($item->uri) ? $item->name : $item->uri;
+            $external =  $this->isExternal($href);
+            $children = $external ? [] : $this->getMenu($item->name);
+            if (empty($children)) {
+                $description = empty($item->description) ? $item->name : $item->description;
+                $activeClass = $active ? ' active' : '';
+                $lines[] = '    <li class="nav-item">';
+                $lines[] = sprintf('      <a class="nav-link'.$activeClass.'" href="%s" title="%s">%s</a>',
+                     $href, $description, $item->title);
             }
-            $path .= $crumb;
-            $menu = $this->getMenu($path);
-            $crumbs[] = $menu[0];
+            else {
+                $id = "dropdown-".$item->name;
+                $lines[] = '    <li class="nav-item dropdown">';
+                $lines[] = sprintf(
+                    '        <a class="nav-link dropdown-toggle" href="%s" id="%s" data-bs-toggle="dropdown" '.
+                        'aria-expanded="false">%s</a>',$href,$id,$item->title);
+                $lines[] = "        <ul class='dropdown-menu' aria-labelledby='$id'>";
+                foreach ($children as $child) {
+                    $description = empty($child->description) ? $child->name : $child->description;
+                    $href = empty($child->uri) ? $item->name.'/'.$child->name : $child->uri;
+                    $lines[] = sprintf('          <li><a class="dropdown-item" href="%s" title="%s">%s</a></li>',
+                        $href,$description, $child->title);
+                }
+                $lines[] = '        </ul>';
+            }
+            $lines[] = '    </li>';
         }
-        foreach ($crumbs as $crumb) {
-            // render crumb
-        }
+        return implode("\n",$lines)."\n";
     }
 
+    public function getBreadCrumbItems($activePath) {
+        $names = explode('/',$activePath);
+        $items = [];
+        while (!empty($names)) {
+            $itemName = array_pop($names);
+            $path = implode('/', $names);
+            if ($itemName) {
+                $item = $this->getMenuItem($itemName,$path);
+                array_unshift($items,$item);
+            }
+        }
+        return $items;
+    }
+
+    /** @noinspection HtmlUnknownTarget */
+    public function renderBreadcrumbs($activePath) {
+        if (empty($activePath)) {
+            return '';
+        }
+        $items = $this->getBreadCrumbItems($activePath);
+        $count = count($items);
+        $last = $count-1;
+        $crumbs = [];
+        $uriPath = '';
+        $crumbs[] = '<nav aria-label="breadcrumb">';
+        $crumbs[] = '  <ol class="breadcrumb">';
+        $crumbs[] = '    <li class="breadcrumb-item"><a href="/">Home</a></li>';
+        for($i = 0; $i<$count; $i++) {
+            $item = $items[$i];
+            $uriPath .= '/'.$item->name;
+            // $href = $uriPath.$item->name;
+            if ($i == $last) {
+                $crumbs[] = sprintf('    <li class="breadcrumb-item active" aria-current="page">%s</li>',$item->title);
+            }
+            else {
+                $description = empty($item->description) ? $item->name : $item->description;
+                $crumbs[] = sprintf('    <li class="breadcrumb-item"><a href="%s" title="%s">%s</a></li>', $uriPath, $description, $item->title);
+            }
+        }
+        $crumbs[] = '  </ol>';
+        $crumbs[] = '</nav>';
+        return implode("\n",$crumbs)."\n";
+    }
+
+    public function printTopMenu($activePath = '') {
+        print $this->renderTopNav($activePath);
+    }
+
+    public function printChildMenu($activePath = '')
+    {
+        print $this->renderMenu($activePath);
+    }
+    public function printSiblingMenu($activePath = '')
+    {
+        $path = explode('/',$activePath);
+        $activeItem = array_shift($path);
+        $activePath = implode('/',$path);
+        print $this->renderMenu($activePath,$activeItem);
+    }
+    public function printBreadcrumbMenu($activePath = '') {
+        print $this->renderBreadcrumbs($activePath);
+    }
+
+    /**
+     * @param $key
+     * @param $node
+     * @param array $menu
+     * @return \stdClass
+     */
+    protected function getItem($key, $node)
+    {
+        $item = new \stdClass();
+        $item->name = $key;
+        foreach ($node->attributes() as $name => $value) {
+            $item->{$name} = sprintf('%s', $value);
+        }
+        return $item;
+    }
 
 }
