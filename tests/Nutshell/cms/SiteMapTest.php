@@ -12,7 +12,7 @@ class SiteMapTest extends TestCase
     public function testGetMenu()
     {
 
-        $map = new SiteMap(DIR_TEST_DATA.'/test-sitemap.xml');
+        $map = new SiteMap(null,DIR_TEST_DATA.'/test-sitemap.xml');
         $actual = $map->getMenu();
         $this->assertNotEmpty($actual);
 
@@ -21,6 +21,9 @@ class SiteMapTest extends TestCase
 
         $actual = $map->getMenu('songs/cowboy');
         $this->assertNotEmpty($actual);
+
+        $map = new SiteMap(null,DIR_TEST_DATA.'/test-sitemap.xml');
+
 
     }
 
@@ -42,25 +45,29 @@ class SiteMapTest extends TestCase
 
     public function testRenderTopNav()
     {
-        // $map = new SiteMap(DIR_TEST_DATA.'/test-sitemap.xml');
-        $map = new SiteMap();
+        $map = new SiteMap('tools');
         $actual = $map->renderTopNav();
         $this->assertNotEmpty($actual);
+
+        $map = new SiteMap(null,DIR_TEST_DATA.'/test-sitemap.xml');
+        $actual = $map->renderTopNav();
+        $this->assertNotEmpty($actual);
+
+
 
     }
 
     public function testRenderMenu()
     {
-        $map = new SiteMap(DIR_TEST_DATA.'/test-sitemap.xml');
-        // $map = new SiteMap();
-        $actual = $map->renderMenu('songs/cowboy','roy-rogers');
+        $map = new SiteMap(null,DIR_TEST_DATA.'/test-sitemap.xml');
+        $actual = $map->renderMenu('roy-rogers','songs/cowboy');
         $this->assertNotEmpty($actual);
 
     }
 
     public function testRenderBreadcrumbs()
     {
-        $map = new SiteMap(DIR_TEST_DATA.'/test-sitemap.xml');
+        $map = new SiteMap(null,DIR_TEST_DATA.'/test-sitemap.xml');
         $actual = $map->renderBreadcrumbs('songs/cowboy/roy-rogers');
         $this->assertNotEmpty($actual);
 

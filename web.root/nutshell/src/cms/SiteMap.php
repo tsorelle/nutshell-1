@@ -13,16 +13,23 @@ class SiteMap
      */
     private $user;
 
-    public function __construct($filePath=null)
+    private $currentUri;
+
+    public function __construct($currentUri=null,$xmlFilePath=null)
     {
-        if (!$filePath) {
-            $filePath = DIR_CONFIG_SITE.'/sitemap.xml';
+        $this->currentUri = $currentUri;
+        if (!$xmlFilePath) {
+            $xmlFilePath = DIR_CONFIG_SITE.'/sitemap.xml';
         }
-        $this->xmldata = simplexml_load_file($filePath);
+        $this->xmldata = simplexml_load_file($xmlFilePath);
         if ($this->xmldata === false) {
-            throw new \Exception("Data file not found: ".$filePath);
+            throw new \Exception("Data file not found: ".$xmlFilePath);
         }
         $this->user = TUser::getCurrent();
+    }
+
+    public function test() {
+        print "<h2>Hello from sitemap</h2>";
     }
 
     public function getMenuItem($itemName,$path='/*') {
@@ -76,7 +83,18 @@ class SiteMap
     }
 
     /** @noinspection HtmlUnknownTarget */
-    public function renderMenu($path,$activeItem='') {
+    public function renderMenu($activeItem=null,$path=null) {
+        if ($path === null) {
+            $path = $this->currentUri;
+        }
+
+        if ($path == 'home' || $path == null) {
+            $path = '';
+        }
+        if ($activeItem === null) {
+            $parts = explode('/',$path);
+            $activeItem = array_pop($parts);
+        }
         $menu = $this->getMenu($path);
         $lines = [];
         $lines[] = '    <ul class="nav flex-column">';
@@ -104,7 +122,13 @@ class SiteMap
     }
 
     /** @noinspection HtmlUnknownTarget */
-    public function renderTopNav($activePath = '') {
+    public function renderTopNav($activePath = null) {
+        if ($activePath === null) {
+            $activePath = $this->currentUri;
+        }
+        if ($activePath == 'home') {
+            $activePath = '';
+        }
         $parts = explode('/',$activePath);
         $activeItem = array_pop($parts);
         $menu = $this->getMenu();
@@ -141,7 +165,10 @@ class SiteMap
         return implode("\n",$lines)."\n";
     }
 
-    public function getBreadCrumbItems($activePath) {
+    public function getBreadCrumbItems($activePath = null) {
+        if ($activePath === null) {
+            $activePath = $this->currentUri;
+        }
         $names = explode('/',$activePath);
         $items = [];
         while (!empty($names)) {
@@ -157,7 +184,10 @@ class SiteMap
 
     /** @noinspection HtmlUnknownTarget */
     public function renderBreadcrumbs($activePath) {
-        if (empty($activePath)) {
+        if ($activePath === null) {
+            $activePath = $this->currentUri;
+        }
+        if (empty($activePath) || $activePath=='home') {
             return '';
         }
         $items = $this->getBreadCrumbItems($activePath);
@@ -185,22 +215,25 @@ class SiteMap
         return implode("\n",$crumbs)."\n";
     }
 
-    public function printTopMenu($activePath = '') {
+    public function printTopMenu($activePath = null) {
         print $this->renderTopNav($activePath);
     }
 
-    public function printChildMenu($activePath = '')
+    public function printChildMenu($activePath = null)
     {
         print $this->renderMenu($activePath);
     }
-    public function printSiblingMenu($activePath = '')
+    public function printSiblingMenu($activePath = null)
     {
+        if ($activePath === null) {
+            $activePath = $this->currentUri;
+        }
         $path = explode('/',$activePath);
         $activeItem = array_shift($path);
         $activePath = implode('/',$path);
-        print $this->renderMenu($activePath,$activeItem);
+        print $this->renderMenu($activeItem,$activePath);
     }
-    public function printBreadcrumbMenu($activePath = '') {
+    public function printBreadcrumbMenu($activePath = null) {
         print $this->renderBreadcrumbs($activePath);
     }
 

@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
+/** @noinspection HtmlUnknownTarget */
+
     if (!isset($title)) {
         $browserTitle = 'Title';
     }
     if (!isset($theme)) {
         $theme = 'default';
     }
+    if (!isset($maincolsize)) {
+        $maincolsize = 12;
+    }
+
+    /** @var \Nutshell\cms\SiteMap $sitemap */
+    /** @var int $maincolsize */
+    /** @var int $colsize */
+    /** @var string $menu */
+    /** @var string $menutype */
+    /** @var string $themeIncludePath */
+
 ?>
 <head>
     <meta charset="UTF-8">
@@ -34,7 +47,7 @@
         <!-- div class="container-fluid" id="peanut-messages" style="position:sticky" -->
         <div id="peanut-messages"  class="container-fluid"  style="position:fixed;top:0;z-index: 10000">
             <div class="row">
-                <div class="col-md-12"   >
+                <div class="col-12">
                     <div id="service-messages-container"><service-messages></service-messages></div>
                 </div>
             </div>
@@ -54,9 +67,24 @@
     <!-- main content -->
     <div  id="nutshell-main-section">
         <div class="container" id="page-content">
-        <?php if (isset($view)) {
-            include $view;
-        } ?>
+            <div class="row">
+                <?php
+                if ($menu=='left') {
+                    include $themeIncludePath."/menu-column";
+                }
+                print sprintf("<div class='main-content-section col-%s'>\n",$maincolsize);
+                    if (isset($view)) {
+                        include $view;
+                    }
+                print '</div>';
+
+                if ($menu=='right') {
+                    include $themeIncludePath."/menu-column";
+                }
+
+                ?>
+            </div>
+        <?php ?>
         </div>
     </div> <!-- end main section -->
 

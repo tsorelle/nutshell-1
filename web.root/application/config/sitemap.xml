@@ -7,5 +7,9 @@
 			<design title="Design" description="" roles=""/>
 		</nutshell>
 	</about>
+	<tools title="Adminsistrator Tools">
+
+	</tools>
+	<help title="Help Pages"/>
 	<!-- page title='' uri='' description='' roles='' / -->
 </site-map>

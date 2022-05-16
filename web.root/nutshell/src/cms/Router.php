@@ -50,19 +50,41 @@ class Router
         */
 
         $routeData = RouteFinder::$matched;
+        $uri = $routeData['uri'];
         $theme = $routeData['theme'] ?? 'default';
         $routeData['theme'] = $theme;
         $routeData['themePath'] = '/application/themes/' . $theme;
         $routeData['themeIncludePath'] = DIR_BASE."/application/themes/$theme/inc";
-        if ($theme !== 'plain') {
-            $showSiteHeader= $routeData['showSiteHeader'] ?? 1;
+
+        if ($theme === 'plain') {
+            $routeData['maincolsize'] = 12;
+        }
+        else {
+            $showSiteHeader= $routeData['header'] ?? 1;
             if ($showSiteHeader !== 1) {
                 unset($routeData['showSiteHeader']);
             }
-            $showSiteFooter= $routeData['showSiteHeader'] ?? 1;
+            $showSiteFooter= $routeData['footer'] ?? 1;
             if ($showSiteFooter !== 1) {
-                unset($routeData['showSiteFooter']);
+                unset($routeData['footer']);
             }
+            $showBreadCrumbs = $routeData['breadcrumbs'] ?? 1;
+            if ($showBreadCrumbs !== 1) {
+                unset($routeData['breadcrumbs']);
+            }
+            $maincolsize = 12;
+            if (isset($routeData['menu'])) {
+                if (!isset($routeData['colsize'])) {
+                    $routeData['colsize'] = 4;
+                }
+                $maincolsize -= $routeData['colsize'];
+                if (!isset($routeData['menutype'])) {
+                    $routeData['menutype'] = 'default';
+                }
+            }
+
+            $routeData['maincolsize'] = $maincolsize;
+
         }
 
         if (isset($routeData['view'])) {
@@ -126,6 +148,7 @@ class Router
         }
 
         $routeData['view'] = $view;
+        $routeData['sitemap'] = new SiteMap($uri);
         extract($routeData);
         include DIR_APPLICATION . '/content/page.php';
     }
