@@ -17,8 +17,10 @@ class TIniFileMerge
     }
 
     public static function Import($inipath,&$ini=array()) {
-        $secondIni = @parse_ini_file($inipath,true);
-        if ($secondIni === false) {
+        if (file_exists($inipath)) {
+            $secondIni = parse_ini_file($inipath,true);
+        }
+        else {
             return $ini;
         }
         if (empty($ini)) {

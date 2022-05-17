@@ -38,6 +38,11 @@ class Router
         exit;
     }
 
+    private static function setSwitchValue(&$routeData,$name,$default=1) {
+        $value = $routeData[$name] ?? $default;
+        $routeData[$name] =  empty($value) ? 0 : 1;
+        $routeData['test'] = $name;
+    }
     private static function routePage()
     {
 
@@ -58,19 +63,20 @@ class Router
 
         if ($theme === 'plain') {
             $routeData['maincolsize'] = 12;
+            self::setSwitchValue($routeData,'siteheader',0);
+            self::setSwitchValue($routeData,'sitefooter',0);
+            self::setSwitchValue($routeData,'breadcrumbs',0);
+            self::setSwitchValue($routeData,'pageheader',0);
         }
         else {
-            $showSiteHeader= $routeData['header'] ?? 1;
-            if ($showSiteHeader !== 1) {
-                unset($routeData['showSiteHeader']);
+            self::setSwitchValue($routeData,'siteheader',1);
+            self::setSwitchValue($routeData,'sitefooter',1);
+            self::setSwitchValue($routeData,'pageheader',1);
+            if ($uri === 'home') {
+                self::setSwitchValue($routeData, 'breadcrumbs', 0);
             }
-            $showSiteFooter= $routeData['footer'] ?? 1;
-            if ($showSiteFooter !== 1) {
-                unset($routeData['footer']);
-            }
-            $showBreadCrumbs = $routeData['breadcrumbs'] ?? 1;
-            if ($showBreadCrumbs !== 1) {
-                unset($routeData['breadcrumbs']);
+            else {
+                self::setSwitchValue($routeData,'breadcrumbs',1);
             }
             $maincolsize = 12;
             if (isset($routeData['menu'])) {
@@ -84,7 +90,6 @@ class Router
             }
 
             $routeData['maincolsize'] = $maincolsize;
-
         }
 
         if (isset($routeData['view'])) {
@@ -136,7 +141,7 @@ class Router
 
             }
             if (isset($errorMessage)) {
-                $view = 'error-page.php';
+                $view = DIR_APPLICATION . '/content/pages/error-page.php';
                 $routeData['errorMessage'] = $errorMessage;
                 unset($routeData['mvvm']);
                 unset($routeData['viewcontainerid']);

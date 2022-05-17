@@ -25,12 +25,5 @@
         </div>
     </nav>
 
-    <?php
-        if (isset($breadcrumbs)) {
-            $sitemap->printBreadcrumbMenu();
-        }
-    ?>
-
-
 </header>
 

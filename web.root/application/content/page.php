@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-/** @noinspection HtmlUnknownTarget */
 
     if (!isset($title)) {
         $browserTitle = 'Title';
@@ -13,19 +12,25 @@
         $maincolsize = 12;
     }
 
+    // varibles from Router.php
     /** @var \Nutshell\cms\SiteMap $sitemap */
     /** @var int $maincolsize */
     /** @var int $colsize */
     /** @var string $menu */
     /** @var string $menutype */
     /** @var string $themeIncludePath */
+    /** @var int $siteheader */
+    /** @var int $sitefooter */
+    /** @var int $pageheader */
 
 ?>
 <head>
     <meta charset="UTF-8">
     <?php
+    /** @noinspection HtmlUnknownTarget */
         printf('<link rel="stylesheet" type="text/css" href="%s/styles.css"></link>',$themePath ?? 'Error missing theme path');
         if (isset($extraSTyles)) {
+            /** @noinspection HtmlUnknownTarget */
             printf('<link rel="stylesheet" type="text/css" href="%s/extra.css"></link>',$themePath ?? 'Error missing theme path');
         }
     ?>
@@ -56,10 +61,10 @@
     <?php } ?>
 
     <?php
-    if (isset($showSiteHeader) && isset($themeIncludePath)) {
+    if ($siteheader === 1) {
         include $themeIncludePath."/site-header.php";
     }
-    if (isset($pageTitle) && isset($themeIncludePath)) {
+    if ($pageheader === 1) {
         include $themeIncludePath."/page-header.php";
     }
     ?>
@@ -70,7 +75,7 @@
             <div class="row">
                 <?php
                 if ($menu=='left') {
-                    include $themeIncludePath."/menu-column";
+                    include $themeIncludePath."/menu-column.php";
                 }
                 print sprintf("<div class='main-content-section col-%s'>\n",$maincolsize);
                     if (isset($view)) {
@@ -79,7 +84,7 @@
                 print '</div>';
 
                 if ($menu=='right') {
-                    include $themeIncludePath."/menu-column";
+                    include $themeIncludePath."/menu-column.php";
                 }
 
                 ?>
@@ -91,7 +96,7 @@
     <!-- todo: yagni - page footer -->
 
     <?php
-    if (isset($showSiteFooter) && isset($themeIncludePath)) {
+    if ($sitefooter === 1) {
         include $themeIncludePath."/site-footer.php";
     }
     ?>
