@@ -8,6 +8,7 @@
 /web.root/application/config/mailgun.ini
 /web.root/application/config/database.ini
 /web.root/application/config/database.php
+/web.root/application/themes/default/styles.css
 /web.root/application/files/**
 /web.root/application/documents/**
 /tests/unit/files/pdf/**
