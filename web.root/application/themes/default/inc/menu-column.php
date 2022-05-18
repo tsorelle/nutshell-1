@@ -4,7 +4,7 @@
 /** @var string $menutype */
 /** @var string $menutitle */
 
-print sprintf("<div class='col-%s'>\n",$colsize);
+print sprintf("<div class='col-md-%s'>\n",$colsize);
 if (!empty($menutitle)) { ?>
     <div class="menu-title">
         <h3>

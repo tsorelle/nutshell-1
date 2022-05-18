@@ -68,7 +68,7 @@ class SiteMapTest extends TestCase
     public function testRenderBreadcrumbs()
     {
         $map = new SiteMap(null,DIR_TEST_DATA.'/test-sitemap.xml');
-        $actual = $map->renderBreadcrumbs('songs/cowboy/roy-rogers');
+        $actual = $map->renderBreadcrumbs('songs/cowboy/roy-rogers','>');
         $this->assertNotEmpty($actual);
 
         $actual = $map->renderBreadcrumbs('songs/cowboy');

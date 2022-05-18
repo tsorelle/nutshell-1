@@ -1,7 +1,8 @@
 <header class="p-3 bg-light text-dark">
-    <nav class="navbar navbar-expand-sm navbar-light bg-light" aria-label="Third navbar example">
+    <nav class="navbar navbar-expand-sm navbar-light bg-light"
+         aria-label="Top navigation">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Site Logo</a>
+            <a class="navbar-brand" href="/">Site Logo</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#nutshell-top-navigation-menu"
                     aria-controls="nutshell-top-navigation-menu" aria-expanded="false" aria-label="Toggle navigation">

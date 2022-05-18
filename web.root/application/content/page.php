@@ -26,12 +26,13 @@
 ?>
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="/application/assets/img/favicon.ico">
     <?php
     /** @noinspection HtmlUnknownTarget */
-        printf('<link rel="stylesheet" type="text/css" href="%s/styles.css"></link>',$themePath ?? 'Error missing theme path');
+        printf('<link rel="stylesheet" type="text/css" href="%s/styles.css"/>',$themePath ?? 'Error missing theme path');
         if (isset($extraSTyles)) {
             /** @noinspection HtmlUnknownTarget */
-            printf('<link rel="stylesheet" type="text/css" href="%s/extra.css"></link>',$themePath ?? 'Error missing theme path');
+            printf('<link rel="stylesheet" type="text/css" href="%s/extra.css"/>',$themePath ?? 'Error missing theme path');
         }
     ?>
     <title>
@@ -77,7 +78,7 @@
                 if ($menu=='left') {
                     include $themeIncludePath."/menu-column.php";
                 }
-                print sprintf("<div class='main-content-section col-%s'>\n",$maincolsize);
+                print sprintf("<div class='main-content-section col-md-%s'>\n",$maincolsize);
                     if (isset($view)) {
                         include $view;
                     }

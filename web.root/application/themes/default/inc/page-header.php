@@ -7,7 +7,7 @@
     if ($breadcrumbs === 1) {
         print '    <div id="breakcrumb-menu">';
         /** @var \Nutshell\cms\SiteMap $sitemap */
-        $sitemap->printBreadcrumbMenu();
+        $sitemap->printBreadcrumbMenu('>');
         print '    </div>';
     }
 

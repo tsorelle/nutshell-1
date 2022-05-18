@@ -81,7 +81,7 @@ class Router
             $maincolsize = 12;
             if (isset($routeData['menu'])) {
                 if (!isset($routeData['colsize'])) {
-                    $routeData['colsize'] = 4;
+                    $routeData['colsize'] = 6;
                 }
                 $maincolsize -= $routeData['colsize'];
                 if (!isset($routeData['menutype'])) {

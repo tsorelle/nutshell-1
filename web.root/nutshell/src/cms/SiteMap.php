@@ -97,6 +97,7 @@ class SiteMap
         }
         $menu = $this->getMenu($path);
         $lines = [];
+        $lines[] = '  <div class="nutshell-vertical-menu">';
         $lines[] = '    <ul class="nav flex-column">';
         foreach ($menu as $item) {
             $lines[] = '      <li class="nav-item">';
@@ -105,7 +106,8 @@ class SiteMap
                 $lines[] = sprintf('        <a class="nav-link disabled" href="#">%s</a>', $item->title);
             }
             else {
-                $description = empty($item->description) ? $item->name : $item->description;
+                // $description = empty($item->description) ? $item->name : $item->description;
+                $description = $item->description ?? '';
                 $href = empty($item->uri) ? $item->name : $item->uri;
                 if ($this->isExternal($href)) {
                     $attrs = sprintf('href="%s" target="_blank"',$href);
@@ -118,6 +120,7 @@ class SiteMap
             $lines[] = '      </li>';
         }
         $lines[] = '    </ul>';
+        $lines[] = '  </div>';
         return implode("\n",$lines)."\n";
     }
 
@@ -138,8 +141,9 @@ class SiteMap
             $href = empty($item->uri) ? $item->name : $item->uri;
             $external =  $this->isExternal($href);
             $children = $external ? [] : $this->getMenu($item->name);
+            // $description = empty($item->description) ? $item->name : $item->description;
+            $description = $item->description ?? '';
             if (empty($children)) {
-                $description = empty($item->description) ? $item->name : $item->description;
                 $activeClass = $active ? ' active' : '';
                 $lines[] = '    <li class="nav-item">';
                 $lines[] = sprintf('      <a class="nav-link'.$activeClass.'" href="%s" title="%s">%s</a>',
@@ -150,10 +154,11 @@ class SiteMap
                 $lines[] = '    <li class="nav-item dropdown">';
                 $lines[] = sprintf(
                     '        <a class="nav-link dropdown-toggle" href="%s" id="%s" data-bs-toggle="dropdown" '.
-                        'aria-expanded="false">%s</a>',$href,$id,$item->title);
+                        'aria-expanded="false" title="%s">%s</a>',$href,$id,$description,$item->title);
                 $lines[] = "        <ul class='dropdown-menu' aria-labelledby='$id'>";
                 foreach ($children as $child) {
-                    $description = empty($child->description) ? $child->name : $child->description;
+                    // $description = empty($child->description) ? $child->name : $child->description;
+                    $description = $child->description ?? '';
                     $href = empty($child->uri) ? $item->name.'/'.$child->name : $child->uri;
                     $lines[] = sprintf('          <li><a class="dropdown-item" href="%s" title="%s">%s</a></li>',
                         $href,$description, $child->title);
@@ -183,7 +188,7 @@ class SiteMap
     }
 
     /** @noinspection HtmlUnknownTarget */
-    public function renderBreadcrumbs($activePath) {
+    public function renderBreadcrumbs($activePath,$divider=null) {
         if ($activePath === null) {
             $activePath = $this->currentUri;
         }
@@ -195,7 +200,12 @@ class SiteMap
         $last = $count-1;
         $crumbs = [];
         $uriPath = '';
-        $crumbs[] = '<nav aria-label="breadcrumb">';
+        $nav = '<nav ';
+        if ($divider) {
+          $nav .= "style=\"--bs-breadcrumb-divider: '>';\" ";
+        }
+        $nav .= 'aria-label="breadcrumb">';
+        $crumbs[] = $nav;
         $crumbs[] = '  <ol class="breadcrumb">';
         $crumbs[] = '    <li class="breadcrumb-item"><a href="/">Home</a></li>';
         for($i = 0; $i<$count; $i++) {
@@ -206,7 +216,8 @@ class SiteMap
                 $crumbs[] = sprintf('    <li class="breadcrumb-item active" aria-current="page">%s</li>',$item->title);
             }
             else {
-                $description = empty($item->description) ? $item->name : $item->description;
+                // $description = empty($item->description) ? $item->name : $item->description;
+                $description = $item->description ?? '';
                 $crumbs[] = sprintf('    <li class="breadcrumb-item"><a href="%s" title="%s">%s</a></li>', $uriPath, $description, $item->title);
             }
         }
@@ -233,8 +244,8 @@ class SiteMap
         $activePath = implode('/',$path);
         print $this->renderMenu($activeItem,$activePath);
     }
-    public function printBreadcrumbMenu($activePath = null) {
-        print $this->renderBreadcrumbs($activePath);
+    public function printBreadcrumbMenu($divider=null, $activePath = null) {
+        print $this->renderBreadcrumbs($activePath,$divider);
     }
 
     /**
