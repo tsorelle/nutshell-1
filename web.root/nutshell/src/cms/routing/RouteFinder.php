@@ -8,12 +8,15 @@ class RouteFinder
 
     public static function match($uri)
     {
-        if ($uri === '') {
+        if ($uri === '' || $uri === '/') {
             $uri = 'home';
         }
         $config = parse_ini_file(DIR_CONFIG_SITE . '/routing.ini', true);
         foreach ($config as $matchPath => $values) {
             if (strpos($uri, $matchPath) === 0) {
+                if ($uri != $matchPath && (!array_key_exists('args',$values))) {
+                    continue;
+                }
                 $matchParts = explode('/', $matchPath);
                 $matchCount = count($matchParts);
                 $pathParts = explode('/', $uri);
