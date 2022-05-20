@@ -5,6 +5,7 @@ namespace Peanut\users;
 use Peanut\users\db\model\entity\Role;
 use Peanut\users\db\model\entity\User;
 use Peanut\users\db\model\entity\Usersession;
+use Peanut\users\db\model\repository\AuthenticationsRepository;
 use Peanut\users\db\model\repository\RolesRepository;
 use Peanut\users\db\model\repository\UserRolesAssociation;
 use Peanut\users\db\model\repository\UsersessionsRepository;
@@ -19,6 +20,7 @@ use Tops\sys\TObjectContainer;
 
 class AccountManager implements IUserAccountManager
 {
+    const maxSignInAttempts = 10;
     /**
      * @var $usersrepository UsersRepository
      */
@@ -294,10 +296,60 @@ class AccountManager implements IUserAccountManager
         return false;
     }
 
+    private $authRepository;
+    private function getAuthRepository() {
+        if (!isset($this->authRepository)) {
+            $this->authRepository = new AuthenticationsRepository();
+        }
+        return $this->authRepository;
+    }
+
+    /**
+     * @return bool|int
+     *
+     * true - ok
+     * false - temporary block
+     * 0 - permanent block
+     */
+    public function signInOk() {
+        $repo = $this->getAuthRepository();
+        $ip = $_SERVER['REMOTE_ADDR'];
+        if(!$ip) {
+            // Not running on a server, probably test script
+            return true;
+        }
+        if ($repo->isBlocked($ip,self::maxSignInAttempts)) {
+            return 0;
+        }
+        $current = ($this->getAuthRepository())->getCurrent($ip);
+        if ($current) {
+            return ($current->attempts > self::maxSignInAttempts);
+        }
+        return true;
+    }
+
+    public function logFailure() {
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $repo = $this->getAuthRepository();
+        $repo->updateForFailure($ip,self::maxSignInAttempts);
+    }
+
+    public function logSuccess() {
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $repo = $this->getAuthRepository();
+        $repo->updateForSuccess($ip);
+    }
+
+    /**
+     * @param $username
+     * @param $pwd
+     * @return bool|User|string
+     */
     public function signIn($username,$pwd) {
         $sessionsRepository = $this->getSessionsRepository();
         $user = $this->authenticateUser($username,$pwd);
         if ($user === false) {
+            $this->logFailure();
             return "User authentication failed.";
 
         }
@@ -306,6 +358,7 @@ class AccountManager implements IUserAccountManager
             return 'Session not initialized';
         }
         $sessionsRepository->newSession($sessionId,$user->id);
+        $this->logSuccess();
         return $user;
     }
 
