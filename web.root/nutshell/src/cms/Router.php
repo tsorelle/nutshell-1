@@ -1,7 +1,9 @@
 <?php
 namespace Nutshell\cms;
 use Peanut\sys\ViewModelManager;
+use Peanut\users\AccountManager;
 use Tops\sys\TSession;
+use Tops\sys\TUser;
 
 class Router
 {
@@ -60,6 +62,10 @@ class Router
         $routeData['theme'] = $theme;
         $routeData['themePath'] = '/application/themes/' . $theme;
         $routeData['themeIncludePath'] = DIR_BASE."/application/themes/$theme/inc";
+        $user = TUser::getCurrent();
+        $routeData['signin'] = $user->isAuthenticated() ?
+            $user->getFullName().' | '.'<a href="/signout">Sign Out</a>' :
+            '<a id="footer-signin-link" href="/signin">Sign in</a>';
 
         if ($theme === 'plain') {
             $routeData['maincolsize'] = 12;
@@ -112,6 +118,14 @@ class Router
                 }
 
                 if (!isset($errorMessage)) {
+                     if (array_key_exists('return',$routeData)) {
+                        $return = $routeData['return'];
+                        if ($return == 'referrer') {
+                            $return = $_SERVER['HTTP_REFERER'];
+                        }
+                        $_SESSION[AccountManager::redirectKey] = $return;
+                        unset($routeData['return']);
+                    }
                     $argNames = $argNames = $routeData['args'] ?? '';
                     if ($argNames) {
                         $argNames = explode(',',$argNames);

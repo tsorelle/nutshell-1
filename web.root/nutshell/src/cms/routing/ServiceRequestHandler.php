@@ -2,7 +2,9 @@
 
 namespace Nutshell\cms;
 
+use Peanut\users\AccountManager;
 use Tops\services\ServiceFactory;
+use Tops\sys\TUser;
 
 class ServiceRequestHandler
 {
@@ -10,6 +12,13 @@ class ServiceRequestHandler
     {
         $response = ServiceFactory::Execute();
         print json_encode($response);
+    }
+
+    public function signout() {
+        $referrer = preg_replace("/(^\/)|(\/$)/","",$_SERVER['HTTP_REFERER']);
+        TUser::SignOut();
+        header('Location: '.$referrer);
+        exit();
     }
 
     public function runtest($testname) {

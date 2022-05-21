@@ -2,6 +2,9 @@
 
 namespace Nutshell\cms;
 
+use Peanut\users\AccountManager;
+use Tops\sys\TUser;
+
 class RouteFinder
 {
     public static $matched = null;

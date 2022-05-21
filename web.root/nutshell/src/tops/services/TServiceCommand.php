@@ -55,10 +55,12 @@ abstract class TServiceCommand {
         $this->context->AddWarningMessage($text,$translated);
     }
 
-    public function setError($text) {
+    public function setError($text,$returnErrorMsg=true) {
         $this->context->setError();
         $this->errorCount++;
-        $this->setReturnValue(TLanguage::text($text));
+        if ($returnErrorMsg) {
+            $this->setReturnValue(TLanguage::text($text));
+        }
         return;
     }
 

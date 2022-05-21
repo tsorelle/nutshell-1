@@ -21,6 +21,7 @@ use Tops\sys\TObjectContainer;
 class AccountManager implements IUserAccountManager
 {
     const maxSignInAttempts = 10;
+    const redirectKey = 'signin_redirect_address';
     /**
      * @var $usersrepository UsersRepository
      */
@@ -323,7 +324,7 @@ class AccountManager implements IUserAccountManager
         }
         $current = ($this->getAuthRepository())->getCurrent($ip);
         if ($current) {
-            return ($current->attempts > self::maxSignInAttempts);
+            return ($current->attempts < self::maxSignInAttempts);
         }
         return true;
     }
@@ -350,8 +351,7 @@ class AccountManager implements IUserAccountManager
         $user = $this->authenticateUser($username,$pwd);
         if ($user === false) {
             $this->logFailure();
-            return "User authentication failed.";
-
+            return false;
         }
         $sessionId = $this->getCurrentSessionId();
         if (!$sessionId) {
@@ -359,7 +359,7 @@ class AccountManager implements IUserAccountManager
         }
         $sessionsRepository->newSession($sessionId,$user->id);
         $this->logSuccess();
-        return $user;
+        return true;
     }
 
     private function getCurrentSessionId() {

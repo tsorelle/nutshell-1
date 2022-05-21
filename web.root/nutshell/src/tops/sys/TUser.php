@@ -91,9 +91,9 @@ class TUser {
         $user = self::Create();
         $success = $user->signIn($username,$password);
 
-//        if ($success) {
-//            TUser::resetCurrentUser();
-//        }
+        if ($success) {
+           TUser::resetCurrentUser();
+       }
         return $success;
     }
 

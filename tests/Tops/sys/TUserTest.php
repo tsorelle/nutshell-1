@@ -16,7 +16,7 @@ class TUserTest extends TestCase
         $account = $manager->addAccount('testuser',$password);
 
         $signedIn = TUser::SignIn($username,$password);
-        $this->assertTrue($signedIn !== false);
+        $this->assertTrue($signedIn === true);
 
         $current = TUser::getCurrent();
         $success = $current !== false;
