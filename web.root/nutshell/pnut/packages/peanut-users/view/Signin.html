@@ -42,7 +42,7 @@
                             </div>
                             <div class="form-group  mb-3" data-bind="visible:pwdvisible">
                                 <label for="visible-pwd">Password</label>
-                                <input type="text" class="form-control" id="visible-pwd" placeholder="Enter Password"
+                                <input type="text" class="form-control" id="visible-pwd" placeholder="Enter password"
                                        data-bind="value:password">
                             </div>
                             <div class="form-check  mb-3">
@@ -57,8 +57,9 @@
                     </div>
                     <div data-bind="visible:status() == 'signing'" class="signin-message-panel">
                         <div class="d-flex align-items-center">
-                            <strong>Sigining in...</strong>
-                            <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+                            <strong style="font-size:1.6rem">Signing in...</strong>
+                            <!-- div class="spinner-border ms-auto" role="status" aria-hidden="true"></div -->
+                            <span class="fa fa-spinner fa-pulse fa-2x ms-3" style="color:lightgrey"></span>
                         </div>
                     </div>
                     <div data-bind="visible:status() == 'ok'" class="signin-message-panel">

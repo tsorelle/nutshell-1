@@ -39,11 +39,10 @@ class SigninCommand extends \Tops\services\TServiceCommand
     protected function run()
     {
         $response = new \stdClass();
-        $user = TUser::getCurrent();
+        // $user = TUser::getCurrent();
         $manager = new AccountManager();
         // $manager->setAdminAccount('B@nj0boy');
         TUser::SignOut();
-        // return;
         $ok = $manager->signInOk();
         if ($ok === true) {
 
@@ -56,7 +55,6 @@ class SigninCommand extends \Tops\services\TServiceCommand
             }
             else {
                 $signedIn = TUser::SignIn($username,$password);
-                    // $manager->signIn($username,$password);
                 if ($signedIn === true) {
                     $user = TUser::getCurrent();
                     $response->status = 'ok';

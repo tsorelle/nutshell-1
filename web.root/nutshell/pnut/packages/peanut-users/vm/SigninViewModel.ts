@@ -43,8 +43,6 @@ namespace PeanutUsers {
                                 case 'ok':
                                     me.redirectlink(response.redirectlink);
                                     me.userfullname(response.userfullname);
-                                    document.getElementById("footer-signin-link").innerHTML =
-                                        response.userfullname+' | '+'<a href="/signout">Sign Out</a>';
                                     break;
                                 case 'failed' :
                                     me.failed(true);
