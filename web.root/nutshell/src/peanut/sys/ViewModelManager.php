@@ -96,13 +96,16 @@ class ViewModelManager
                 $packagePath = $fileRoot . $packagePath;
 
                 foreach ($packages as $package) {
-                    $pkgini = @parse_ini_file($packagePath . "/$package/config/viewmodels.ini", true);
-                    if (!empty($pkgini)) {
-                        $keys = array_keys($pkgini);
-                        foreach ($keys as $key) {
-                            $pkgini[$key]['package'] = $package;
+                    $iniPath = $packagePath . "/$package/config/viewmodels.ini";
+                    if (file_exists($iniPath)) {
+                        $pkgini = parse_ini_file($packagePath . "/$package/config/viewmodels.ini", true);
+                        if (!empty($pkgini)) {
+                            $keys = array_keys($pkgini);
+                            foreach ($keys as $key) {
+                                $pkgini[$key]['package'] = $package;
+                            }
+                            self::$vmSettings = array_merge(self::$vmSettings, $pkgini);
                         }
-                        self::$vmSettings = array_merge(self::$vmSettings, $pkgini);
                     }
                 }
             }
@@ -162,7 +165,7 @@ class ViewModelManager
     }
 
     /**
-     * @return bool|ViewModelInfo
+     * @return bool|ViewModelInfo[] | bool
      */
     public static function getViewModelInfo()
     {
