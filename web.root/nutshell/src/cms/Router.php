@@ -4,10 +4,12 @@ use Peanut\sys\ViewModelManager;
 use Peanut\users\AccountManager;
 use Tops\sys\TSession;
 use Tops\sys\TUser;
+use Tops\sys\TWebSite;
 
 class Router
 {
     public static function Execute() {
+        self::checkAuthorization();
         switch (RouteFinder::$matched['handler'] ?? null) {
             case 'page' :
                 self::routePage();
@@ -19,6 +21,10 @@ class Router
                 throw new \Exception('Invalid configuation, must include "handler"');
         }
         return true;
+    }
+
+    public static function redirectToSignin() {
+
     }
 
     public static function routeService()
@@ -58,6 +64,7 @@ class Router
 
         $routeData = RouteFinder::$matched;
         $uri = $routeData['uri'];
+        $user = TUser::getCurrent();
         $theme = $routeData['theme'] ?? 'default';
         $routeData['theme'] = $theme;
         $routeData['themePath'] = '/application/themes/' . $theme;
@@ -121,11 +128,15 @@ class Router
                      if (array_key_exists('return',$routeData)) {
                         $return = $routeData['return'];
                         if ($return == 'referrer') {
-                            $return = $_SERVER['HTTP_REFERER'];
+
+                            $return = isset($_SESSION[AccountManager::returnKey]) ?
+                                $_SESSION[AccountManager::returnKey] :
+                                $_SERVER['HTTP_REFERER'];
                         }
                         $_SESSION[AccountManager::redirectKey] = $return;
                         unset($routeData['return']);
                     }
+                    unset($_SESSION[AccountManager::returnKey]);
                     $argNames = $argNames = $routeData['args'] ?? '';
                     if ($argNames) {
                         $argNames = explode(',',$argNames);
@@ -171,5 +182,25 @@ class Router
         extract($routeData);
         include DIR_APPLICATION . '/content/page.php';
     }
-    
+
+    private static function checkAuthorization()
+    {
+        $user = TUser::getCurrent();
+        $rolelist = RouteFinder::$matched['roles'] ?? null;
+        if (!empty($rolelist)) {
+            $roles = explode(',',$rolelist);
+            foreach ($roles as $role) {
+                if (!$user->isMemberOf($role)) {
+                    $signinConfig = RouteFinder::$routes['signin'];
+                    $signinConfig['uri'] = 'signin';
+                    $uri = RouteFinder::$matched['uri'] ?? '/';
+                    $redirect = TWebSite::ExpandUrl($uri);
+                    $_SESSION[AccountManager::returnKey] = $redirect;
+                    RouteFinder::$matched = $signinConfig;
+                    return;
+                }
+            }
+        }
+    }
+
 }

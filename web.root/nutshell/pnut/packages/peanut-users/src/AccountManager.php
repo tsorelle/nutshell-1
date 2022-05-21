@@ -22,6 +22,7 @@ class AccountManager implements IUserAccountManager
 {
     const maxSignInAttempts = 10;
     const redirectKey = 'signin_redirect_address';
+    const returnKey = 'router_return_address';
     /**
      * @var $usersrepository UsersRepository
      */

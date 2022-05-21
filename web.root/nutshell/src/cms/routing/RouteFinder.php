@@ -8,14 +8,15 @@ use Tops\sys\TUser;
 class RouteFinder
 {
     public static $matched = null;
+    public static $routes = null;
 
     public static function match($uri)
     {
         if ($uri === '' || $uri === '/') {
             $uri = 'home';
         }
-        $config = parse_ini_file(DIR_CONFIG_SITE . '/routing.ini', true);
-        foreach ($config as $matchPath => $values) {
+        self::$routes = parse_ini_file(DIR_CONFIG_SITE . '/routing.ini', true);
+        foreach (self::$routes as $matchPath => $values) {
             if (strpos($uri, $matchPath) === 0) {
                 if ($uri != $matchPath && (!array_key_exists('args',$values))) {
                     continue;
