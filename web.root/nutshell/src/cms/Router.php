@@ -127,16 +127,13 @@ class Router
                 if (!isset($errorMessage)) {
                      if (array_key_exists('return',$routeData)) {
                         $return = $routeData['return'];
-                        if ($return == 'referrer') {
 
-                            $return = isset($_SESSION[AccountManager::returnKey]) ?
-                                $_SESSION[AccountManager::returnKey] :
-                                $_SERVER['HTTP_REFERER'];
+                        if ($return == 'referrer') {
+                            $return = $_SERVER['HTTP_REFERER'];
                         }
                         $_SESSION[AccountManager::redirectKey] = $return;
                         unset($routeData['return']);
                     }
-                    unset($_SESSION[AccountManager::returnKey]);
                     $argNames = $argNames = $routeData['args'] ?? '';
                     if ($argNames) {
                         $argNames = explode(',',$argNames);
@@ -187,20 +184,25 @@ class Router
     {
         $user = TUser::getCurrent();
         $rolelist = RouteFinder::$matched['roles'] ?? null;
-        if (!empty($rolelist)) {
+        if (!empty(trim($rolelist))) {
             $roles = explode(',',$rolelist);
+            $ok = false;
             foreach ($roles as $role) {
-                if (!$user->isMemberOf($role)) {
-                    $signinConfig = RouteFinder::$routes['signin'];
-                    $signinConfig['uri'] = 'signin';
-                    $uri = RouteFinder::$matched['uri'] ?? '/';
-                    $redirect = TWebSite::ExpandUrl($uri);
-                    $_SESSION[AccountManager::returnKey] = $redirect;
-                    RouteFinder::$matched = $signinConfig;
-                    return;
+                if ($user->isMemberOf($role)) {
+                    $ok = true;
+                    break;
                 }
+            }
+            if (!$ok) {
+                // redirect to signin page
+                $signinConfig = RouteFinder::$routes['signin'];
+                $signinConfig['uri'] = 'signin';
+                $uri = RouteFinder::$matched['uri'] ?? '/';
+                $redirect = TWebSite::ExpandUrl($uri);
+                // $_SESSION[AccountManager::returnKey] = $redirect;
+                $signinConfig['return'] = $redirect;
+                RouteFinder::$matched = $signinConfig;
             }
         }
     }
-
 }
