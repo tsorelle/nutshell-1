@@ -381,6 +381,9 @@ class AccountManager implements IUserAccountManager
         return $this->getRolesRepository()->getSingleEntity('name = ?',[$name]);
     }
 
+    /**
+     * @return Role[]|false
+     */
     public function getRoles() {
         return $this->getRolesRepository()->getAll();
     }
@@ -410,7 +413,7 @@ class AccountManager implements IUserAccountManager
     }
 
     public function addRoleForUserId($userId,$roleName) {
-        $roleId = $this->getRoleIdForName($roleName);
+        $roleId = is_numeric($roleName) ? $roleName : $this->getRoleIdForName($roleName);
         if (!$roleId) {
             return 'Role not found';
         }
@@ -443,6 +446,19 @@ class AccountManager implements IUserAccountManager
         }
         // $this->getUserRolesAssociation()->removeAssociationLeft($userId,$roleId);
         $this->getUserRolesAssociation()->removeAssociationRight($userId,$roleId);
+        return true;
+    }
+
+    public function setUserRoles($usr,array $roles) {
+        $userId = $this->getAccountIdForUsername($usr);
+        if (!$userId) {
+            return 'User not found';
+        }
+        $association = $this->getUserRolesAssociation();
+        $association->removeAllRight($userId);
+        foreach ($roles as $roleId) {
+            $association->addAssociationRight($userId,$roleId);
+        }
         return true;
     }
 
@@ -522,6 +538,42 @@ class AccountManager implements IUserAccountManager
         }
 
         return [];
+    }
+
+    public function getUserList()
+    {
+        $users = $this->getProfilesRepository()->getUserProfiles();
+        if (empty($users)) {
+            return [];
+        }
+        foreach ($users as $user) {
+            $user->roles = $this->getUserRoleIds($user->accountId);
+        }
+        return $users;
+    }
+
+    public function updateUser(int $accountId, $fullname, $email, array $roles)
+    {
+        $emailId = $this->getCmsUserIdByEmail($email);
+        if ($emailId != $accountId) {
+            return 'Email address is used by another account.';
+        }
+        $profilesRepo = $this->getProfilesRepository();
+        $profilesRepo->updateProfileValues([
+            'email' => $email,
+            'full-name' => $fullname],$accountId);
+
+        $this->setUserRoles($accountId,$roles);
+        return true;
+    }
+
+    private function getUserRoleIds($usr)
+    {
+        $id = $this->getAccountIdForUsername($usr);
+        if (!$id) {
+            return false;
+        }
+        return $this->getUserRolesAssociation()->getRightValues($id);
     }
 
 

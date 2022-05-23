@@ -71,7 +71,7 @@ class Router
         $routeData['themeIncludePath'] = DIR_BASE."/application/themes/$theme/inc";
         $user = TUser::getCurrent();
         $routeData['signin'] = $user->isAuthenticated() ?
-            $user->getFullName().' | '.'<a href="/signout">Sign Out</a>' :
+            $user->getFullName().' | '.'<a class="ms-2" href="/signout">Sign Out</a>' :
             '<a id="footer-signin-link" href="/signin">Sign in</a>';
 
         if ($theme === 'plain') {

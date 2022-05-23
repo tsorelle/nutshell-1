@@ -58,7 +58,7 @@ namespace Peanut {
         init(successFunction?: () => void) {
             let me = this;
             console.log('Init MultiselectTest');
-            me.application.registerComponents('@pnut/multi-select', () => {
+            me.application.registerComponents('@pnut/selected-list,@pnut/multi-select', () => {
                     me.application.loadResources([
                         '@pnut/multiSelectObservable'
                     ], () => {

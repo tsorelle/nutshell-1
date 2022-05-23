@@ -6,7 +6,6 @@ namespace PeanutUsers {
 
     export class SigninViewModel extends Peanut.ViewModelBase {
         // observables
-        pwdvisible = ko.observable(false);
         username = ko.observable('');
         password = ko.observable('');
         status = ko.observable('ready');
@@ -18,9 +17,10 @@ namespace PeanutUsers {
         init(successFunction?: () => void) {
             let me = this;
             Peanut.logger.write('Signin Init');
-
-            me.bindDefaultSection();
-            successFunction();
+            me.application.registerComponents('@pnut/change-password', () => {
+                me.bindDefaultSection();
+                successFunction();
+            });
         }
 
         onSigninRequest = () => {
@@ -61,7 +61,7 @@ namespace PeanutUsers {
                     }).fail(() => {
                         me.errormessage('Unknown error')
                         me.status('error');
-                        let trace = me.services.getErrorInformation();
+                        me.services.getErrorInformation();
                     }).always(() => {
                 });
 

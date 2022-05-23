@@ -5,8 +5,14 @@
             <div class="col-md-12">
                 <h4>Multiselect</h4>
                 <div style="margin-top: 1rem">
-                    <multi-select params="controller: multiSelectTestController,sort:'code',translator:self, label:'Multiselect', caption:'Select something...'"></multi-select>
+                    <multi-select params="controller: multiSelectTestController,sort:'code',translator:self, label:'Multiselect',
+                        caption:'Select something...'"></multi-select>
                 </div>
+
+                <div>
+                    <selected-list params="source:multiSelectTestController,label:'Things READONLY',readonly:true,emptymessage:'Nothing here'"></selected-list>
+                </div>
+
             </div>
         </div>
     </div>

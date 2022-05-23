@@ -15,4 +15,5 @@ interface IProfilesRepository
     public function getEmail($accountId);
     public function getAccountIdByEmail($email);
     public function removeProfile($accountId);
+    public function getUserProfiles();
 }
