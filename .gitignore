@@ -2,7 +2,7 @@
 /backackup
 /sql/backup
 /vendor
-/sass
+/sass/assets/bootstrap/**
 /peanut/tests
 /web.root/robots.txt
 /web.root/application/config/mailgun.ini
