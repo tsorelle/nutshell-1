@@ -16,6 +16,7 @@
 			<smoketest title="Smoke Test" description="Full Peanut Features test" roles="" />
 			<multiselect title="Multiselect Test" description="Demo multiselect component" roles="" />
 			<password title="Password Test" description="Demo change password component" roles="" />
+			<pager title="Pager Test" description="Demo pager component" roles="" />
 		</tests>
 		<users title="Users" description="User management" roles="administrator" />
 	</tools>
