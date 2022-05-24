@@ -23,9 +23,9 @@ namespace Peanut {
          */
 
         public static getRequestParam(name) {
-            if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
-                return decodeURIComponent(name[1]);
-            return null;
+            // todo: test this
+            let found = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search)
+            found ? decodeURIComponent(name[1]) : null;
         }
 
         public static ValidateEmail(email: string) {
@@ -417,6 +417,19 @@ namespace Peanut {
         }
 
 
+        // replaces lodash _.findIndex
+        public static FindIndex(list, testfunction : (any) => boolean) {
+            if (Array.isArray(list)) {
+                let len = list.length;
+                for(let i = 0;i<len; i++) {
+                    if (testfunction(list[i])) {
+                        return i;
+                    }
+                }
+            }
+            return -1;
+        }
+
         public static SortBy(list, property) {
             let clone = [...list];
             return clone.sort((v1,v2) => {
@@ -431,6 +444,8 @@ namespace Peanut {
                 return 0;
             });
         }
+
+
 
 
     } // end class Helper
