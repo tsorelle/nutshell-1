@@ -48,6 +48,7 @@
     <?php } ?>
 </head>
 <body>
+    <div id="page-top"></div>
     <?php if ($mvvm) { ?>
         <!-- Peanut service messages container -->
         <!-- div class="container-fluid" id="peanut-messages" style="position:sticky" -->
