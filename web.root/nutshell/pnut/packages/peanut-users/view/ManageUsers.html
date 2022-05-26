@@ -81,7 +81,7 @@
                                        type="text" placeholder="Username" aria-label="username">
                             </div>
                             <div class="mb-3">
-                                <change-password params="password:userForm.password"></change-password>
+                                <change-password params="password:userForm.password,label:'Password'"></change-password>
                             </div>
                         </div>
 
@@ -139,7 +139,7 @@
                                data-bind="text:userForm.errorMessage"></p>
                         </div>
                     <div class="mb-3">
-                        <change-password params="password:userForm.password"></change-password>
+                        <change-password params="password:userForm.password,id:'reset-pwd'"></change-password>
                     </div>
                     <div>
                         <button type="button" class="btn btn-primary me-3" data-bind="click:resetUserPassword">Reset</button>

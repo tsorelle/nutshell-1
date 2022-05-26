@@ -5,6 +5,9 @@ namespace Peanut {
         // observables
         errorMessage = ko.observable('');
         pwdvisible = ko.observable(false);
+        controlIdShow = ko.observable('change-password-visible');
+        controlIdHide = ko.observable('change-password-hidden');
+        label = ko.observable('');
 
         password : KnockoutObservable<string>;
 
@@ -21,6 +24,14 @@ namespace Peanut {
                 return;
             }
             me.password = params.password;
+            if (params.id) {
+                me.controlIdHide(params.id+'-hidden');
+                me.controlIdShow(params.id+'-visible');
+            }
+            if (params.label) {
+                me.label(params.label);
+            }
+
             me.password('');
             me.pwdvisible(false);
         }
