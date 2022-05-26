@@ -153,8 +153,7 @@ namespace Peanut {
         public static getHostUrl() {
             let protocol = location.protocol;
             let slashes = protocol.concat("//");
-            let host = slashes.concat(window.location.hostname);
-            return host;
+            return slashes.concat(window.location.hostname);
         }
 
         /**
@@ -445,7 +444,10 @@ namespace Peanut {
             });
         }
 
-
+        public static ScrollToTop() {
+            let pos =  document.getElementById('page-top');
+            pos.scrollIntoView({behavior: "smooth"});
+        }
 
 
     } // end class Helper
