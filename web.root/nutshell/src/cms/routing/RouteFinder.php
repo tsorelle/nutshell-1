@@ -10,11 +10,18 @@ class RouteFinder
     public static $matched = null;
     public static $routes = null;
 
-    public static function match($uri)
-    {
+    private static function normalizeUri($uri)  {
+        $parts = explode('?',$uri);
+        $uri = $parts[0];
         if ($uri === '' || $uri === '/') {
             $uri = 'home';
         }
+        return $uri;
+    }
+
+    public static function match($uri)
+    {
+        $uri = self::normalizeUri($uri);
         self::$routes = parse_ini_file(DIR_CONFIG_SITE . '/routing.ini', true);
         foreach (self::$routes as $matchPath => $values) {
             if (strpos($uri, $matchPath) === 0) {
@@ -28,6 +35,11 @@ class RouteFinder
                     if ($pathParts[$i] !== $matchParts[$i]) {
                         return false;
                     }
+                }
+                $handler = $values['handler'] ?? null;
+                if ($handler === 'redirect') {
+                    $uri=  self::normalizeUri($values['target'] ?? '');
+                    continue;
                 }
                 $configuration = $values;
                 $pathCount = count($pathParts);

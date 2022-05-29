@@ -105,7 +105,7 @@ namespace Peanut {
         };
 
         public getPageVarialble(id: string)  {
-            let input = (<HTMLInputElement> document.getElementById('tester'));
+            let input = (<HTMLInputElement> document.getElementById(id));
             return input ? input.value : null;
         }
 
