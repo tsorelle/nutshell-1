@@ -9,7 +9,7 @@
 namespace Peanut\contacts\services\messaging;
 
 
-use Peanut\contacts\db\DirectoryManager;
+use Peanut\contacts\db\ContactsManager;
 use Tops\services\TServiceCommand;
 use Tops\sys\TConfiguration;
 use Tops\sys\TL;
@@ -43,7 +43,7 @@ class UnsubscribeListCommand extends TServiceCommand
             return;
         }
 
-        $result = (new DirectoryManager())->unsubscribeEmail($request->uid,$request->listId);
+        $result = (new ContactsManager())->unsubscribeEmail($request->uid,$request->listId);
         if (empty($result->personName)) {
             $this->addErrorMessage('dir-no-person-found');
             return;

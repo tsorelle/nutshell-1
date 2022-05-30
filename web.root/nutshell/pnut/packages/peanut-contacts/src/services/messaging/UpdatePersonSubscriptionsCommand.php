@@ -9,7 +9,7 @@
 namespace Peanut\contacts\services\messaging;
 
 
-use Peanut\contacts\db\DirectoryManager;
+use Peanut\contacts\db\ContactsManager;
 use Tops\services\TServiceCommand;
 
 /**
@@ -35,32 +35,25 @@ class UpdatePersonSubscriptionsCommand extends TServiceCommand
             $this->addErrorMessage('service-invalid-request');
             return;
         }
-        
-        if (isset($request->emailSubscriptions)) {
-            $personId = isset($request->personId) ? $request->personId : null;
-            if ($personId === null) {
-                $this->addErrorMessage('service-error-no-personid');
-                return;
-            }
+
+        $personId = $request->personId ?? null;
+        if ($personId === null) {
+            $this->addErrorMessage('service-error-no-personid');
+            return;
         }
-        if (isset($request->postalSubscriptions)) {
-            $addressId = isset($request->addressId) ? $request->addressId : null;
-            if ($addressId === null) {
-                $this->addErrorMessage('service-error-no-addressid');
-                return;
-            }
-        }
-        $manager = new DirectoryManager();
+
+        $manager = new ContactsManager();
         $manager->updateEmailSubscriptions($personId,$request->emailSubscriptions);
-        $manager->updatePostalSubscriptions($addressId,$request->postalSubscriptions);
-        if (isset($request->notifications)) {
-            if ($request->notifications == 0) {
-                $manager->disableNotifications($personId);
-            }
-            else {
-                $manager->enableNotifications($personId);
-            }
-        }
+        /*
+                $manager->updatePostalSubscriptions($addressId,$request->postalSubscriptions);
+                if (isset($request->notifications)) {
+                    if ($request->notifications == 0) {
+                        $manager->disableNotifications($personId);
+                    }
+                    else {
+                        $manager->enableNotifications($personId);
+                    }
+                }*/
         $this->addInfoMessage('service-message-subscriptions-updated');
     }
 }

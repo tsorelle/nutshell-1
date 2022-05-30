@@ -5,6 +5,7 @@ use Peanut\contacts\db\model\entity\Contact;
 use Peanut\contacts\db\model\repository\ContactsRepository;
 use Peanut\contacts\db\model\repository\EmailListsRepository;
 use Peanut\contacts\db\model\repository\EmailSubscriptionAssociation;
+use Tops\db\model\repository\LookupTableRepository;
 
 class ContactsManager
 {
@@ -105,5 +106,75 @@ class ContactsManager
         $repo->update($contact);
         return true;
     }
+
+    public function unsubscribeEmail($uid,$listId) {
+        $repository = $this->getEmailListsRepository();
+        $result = $repository->unsubscribeByUid($uid,$listId);
+        if ($result === false) {
+            $result = new \stdClass();
+            $result->removed = false;
+            $person = $this->getContactsRepository()->getEntityByUid($uid);
+            $result->personName = $person ? $person->fullname : null;
+            $list = $repository->get($listId);
+            $result->listName = $list ? $list->name : null;
+        }
+        else {
+            $result->removed = true;
+        }
+        return $result;
+    }
+
+    public function getSubscriptionValues($userId)
+    {
+        $response = new \stdClass();
+        $response->emailSubscriptions = [];
+        $response->postalSubscriptions = [];
+        $response->personId = 0;
+        $response->addressId = 0;
+        $response->personName = '';
+        $response->accountId = 0;
+
+        $personsRepository = $this->getContactsRepository();
+        if (is_numeric($userId)) {
+            $person = $personsRepository->getByAccountId($userId);
+        }
+        else {
+            $person = $this->getPersonByUid($userId);
+        }
+
+        if (!$person) {
+            return false;
+        }
+
+        if ($person) {
+            $response->personName = $person->fullname;
+            $response->personId = $person->id;
+            $response->accountId = $person->accountId;
+            $response->emailSubscriptions = $this->getEmailSubscriptionsAssociation()->getListValues($response->personId);
+            // $response->notifications = $personsRepository->recievesNotifications($person->uid);
+        }
+        return $response;
+
+    }
+
+    private function getPersonByUid($userId)
+    {
+        return $this->getContactsRepository()->getEntityByUid($userId);
+    }
+    public function getEmailListLookup($includeAdminOnly = false, $translate = false)
+    {
+        $filter = 'cansubscribe=1';
+        if ($includeAdminOnly) {
+            $filter .= ' OR adminonly=1';
+        }
+        $repository = new LookupTableRepository('qnut_email_lists');
+        return $repository->getLookupList($translate, $filter);
+    }
+
+    public function updateEmailSubscriptions($personId, $emailSubscriptions)
+    {
+        $this->getEmailSubscriptionsAssociation()->updateSubscriptions($personId,$emailSubscriptions);
+    }
+
 
 }
