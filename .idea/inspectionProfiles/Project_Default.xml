@@ -4,7 +4,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="15">
+          <list size="19">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -20,12 +20,17 @@
             <item index="12" class="java.lang.String" itemvalue="change-password" />
             <item index="13" class="java.lang.String" itemvalue="selected-list" />
             <item index="14" class="java.lang.String" itemvalue="pager" />
+            <item index="15" class="java.lang.String" itemvalue="translate" />
+            <item index="16" class="java.lang.String" itemvalue="clean-html" />
+            <item index="17" class="java.lang.String" itemvalue="modal-confirm" />
+            <item index="18" class="java.lang.String" itemvalue="mailbox-manager" />
           </list>
         </value>
       </option>
       <option name="myCustomValuesEnabled" value="true" />
     </inspection_tool>
     <inspection_tool class="PhpIllegalPsrClassPathInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="RegExpRedundantEscape" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
       <option name="processCode" value="false" />
       <option name="processLiterals" value="true" />

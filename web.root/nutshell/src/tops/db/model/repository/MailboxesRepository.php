@@ -74,9 +74,9 @@ class MailboxesRepository extends TEntityRepository
         $stmt = $this->executeStatement($sql,$params);
         $stmt->setFetchMode(PDO::FETCH_OBJ);
         $result = $stmt->fetchAll();
-        if (empty($result)) {
+/*        if (empty($result)) {
             return false;
-        }
+        }*/
         return $result;
     }
 }

@@ -1,9 +1,7 @@
         let me = this;
         let request = null; // assign request, e.g. {'this' : 1, 'that' : 2}
-
         me.application.hideServiceMessages();
         me.application.showWaiter('Message here...');
-
         // single statement example
         me.services.executeService('namespace::ServiceName',request,
                 function(serviceResponse: Peanut.IServiceResponse) {

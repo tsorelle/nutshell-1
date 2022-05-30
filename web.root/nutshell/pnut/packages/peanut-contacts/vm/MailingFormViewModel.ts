@@ -60,6 +60,15 @@ namespace PeanutContacts {
         adminonly: any;
     }
 
+    interface IEmailSubscriber {
+        id: any;
+        fullname: string;
+        emailAddress: string;
+        unsubscribe: number;
+    }
+
+
+
     export class MailingFormViewModel extends Peanut.ViewModelBase implements IMailboxFormOwner{
         sendRequest : IEMailListSendRequest = null;
 
@@ -76,18 +85,27 @@ namespace PeanutContacts {
         mailboxes : Mailboxes.MailboxListObservable;
         sendTest = ko.observable(false);
         sendAddress = ko.observable('');
-
+        subscibersVisible = ko.observable(false);
+        unsubscribes = ko.observable(false);
 
         private queuePageSize = 10;
+        private itemsPerPage = 10;
 
         currentQueuePage = ko.observable(1);
         maxQueuePages = ko.observable(1);
         refreshingQueue = ko.observable(false);
 
+        currentSubscribersPage = ko.observable(1);
+        maxSubscriberPages = ko.observable(1);
+        refreshingSubscribers = ko.observable(false);
+
         mailingListLookup = ko.observableArray<ILookupItem>([]);
         mailingLists = ko.observableArray<IEmailListItem>([]);
         mailboxList : KnockoutObservableArray<IMailBox> = ko.observableArray([]);
         selectedMailingList = ko.observable<ILookupItem>(null);
+        selectedSubscriberList = ko.observable<ILookupItem>(null);
+        listSubscribers = ko.observableArray<IEmailSubscriber>();
+        subscribers : IEmailSubscriber[] = [];
         defaultListCode = '';
         selectMailingListCaption = ko.observable('Select a mailing list');
         // templateSelectCaption = ko.observable('No template');
@@ -102,7 +120,7 @@ namespace PeanutContacts {
         // messageTemplates = ko.observableArray<string>([]);
         //  selectedMessageTemplate = ko.observable();
         editorView = ko.observable('html');
-        tab=ko.observable('message');
+        tab=ko.observable('lists');
         queueStatus=ko.observable('active');
         messageHistory = ko.observableArray<IMessageHistoryItem>([]);
         pausedUntil = ko.observable('');
@@ -135,8 +153,6 @@ namespace PeanutContacts {
         };
 
 
-
-
         previousMessage = {'listId' : -1, 'messageText' : ''};
         currentModal = '';
 
@@ -162,15 +178,23 @@ namespace PeanutContacts {
                             me.application.hideWaiter();
                             me.bindDefaultSection();
 
-                            let startTab = me.getRequestVar('tab');
+
+                            let startTab = me.getPageVarialble('start-tab');
+                            if (!startTab) {
+                                startTab = me.getRequestVar('tab');
+                            }
+
                             switch(startTab) {
+                                case 'message' :
+                                    me.showMessageTab()
+                                    break;
                                 case 'queue' :
                                     me.getMessageQueue(1);
                                     break;
                                 case 'mailboxes' :
                                     me.showMailboxes();
                                     break;
-                                case 'lists' :
+                                default :
                                     me.showLists();
                                     break;
                             }
@@ -184,7 +208,6 @@ namespace PeanutContacts {
         }
 
         initEditor = (selector: string) => {
-            let me = this;
             let host = Peanut.Helper.getHostUrl() + '/';
             tinymce.init({
                 selector: selector,
@@ -243,7 +266,7 @@ namespace PeanutContacts {
                         me.formVisible(false);
                     }
                 }).fail(() => {
-                let trace = me.services.getErrorInformation();
+                me.services.getErrorInformation();
             }).always(() => {
                 if (doneFunction) {
                     doneFunction();
@@ -300,7 +323,6 @@ namespace PeanutContacts {
         };
 
         cleanHtml = () => {
-            let me = this;
             let request = {
                 blanks: true,
                 headings: 'h2'
@@ -311,10 +333,8 @@ namespace PeanutContacts {
                 let lines = content.split("\n");
                 if (request.blanks) {
                     lines = lines.filter((item: string) => {
-                        if (item == '<p>&nbsp;</p>' || item == '<p><strong>&nbsp;</strong></p>') {
-                            return false;
-                        }
-                        return true;
+                        return !(item == '<p>&nbsp;</p>' || item == '<p><strong>&nbsp;</strong></p>');
+                        
                     });
                 }
                 if (request.headings) {
@@ -416,7 +436,7 @@ namespace PeanutContacts {
                     }
                 }
             ).fail(function () {
-                let trace = me.services.getErrorInformation();
+                me.services.getErrorInformation();
             }).always(function () {
                 me.application.hideWaiter();
             });
@@ -428,6 +448,18 @@ namespace PeanutContacts {
 
         onQueuePaged = (moved: number) => {
             this.getMessageQueue(this.currentQueuePage() + moved);
+        };
+
+        onSubscribersPaged = (moved: number) => {
+            let current = this.currentSubscribersPage() + moved;
+            let start = this.itemsPerPage * (current - 1)
+            let end = start + this.itemsPerPage;
+            let pageSet = this.subscribers.slice(start,end);
+            if (pageSet.length > 0) {
+                this.listSubscribers(pageSet);
+                this.currentSubscribersPage(current);
+            }
+            Peanut.Helper.ScrollTo('subscriber-list');
         };
 
         refreshQueue = () => {
@@ -454,7 +486,7 @@ namespace PeanutContacts {
                         }
                     }
                 }).fail(() => {
-                let trace = me.services.getErrorInformation();
+                    me.services.getErrorInformation();
             }).always(() => {
                 if (pageNumber == 1) {
                     me.application.hideWaiter();
@@ -476,7 +508,7 @@ namespace PeanutContacts {
                         }
                     }
                 }).fail(() => {
-                let trace = me.services.getErrorInformation();
+                    me.services.getErrorInformation();
             }).always(() => {
                 me.application.hideWaiter();
             });
@@ -517,7 +549,7 @@ namespace PeanutContacts {
                         }
                     }
                 }).fail(() => {
-                let trace = me.services.getErrorInformation();
+                  me.services.getErrorInformation();
             }).always(() => {
                 me.application.hideWaiter();
             });
@@ -538,7 +570,7 @@ namespace PeanutContacts {
                         }
                     }
                 }).fail(() => {
-                let trace = me.services.getErrorInformation();
+                  me.services.getErrorInformation();
             }).always(() => {
             });
 
@@ -565,7 +597,7 @@ namespace PeanutContacts {
                         }
                     }
                 }).fail(() => {
-                let trace = me.services.getErrorInformation();
+                  me.services.getErrorInformation();
             }).always(() => {
                 me.application.hideWaiter();
             });
@@ -646,7 +678,7 @@ namespace PeanutContacts {
                             }
                         }
                     }).fail(() => {
-                        let trace = me.services.getErrorInformation();
+                          me.services.getErrorInformation();
                     }).always(() => {
                         me.application.hideWaiter();
                     });
@@ -699,6 +731,81 @@ namespace PeanutContacts {
 
         onTabChange = () => {
             this.application.hideServiceMessages();
+        }
+
+        showSubscribers = (list: IEmailListItem) => {
+            let me = this;
+            me.application.hideServiceMessages();
+            me.showLoadWaiter();
+            me.refreshingSubscribers(true);
+            me.services.executeService('peanut.contacts::messaging.GetEmailSubscribersList', list.id
+                ,function (serviceResponse: Peanut.IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.selectedSubscriberList(list);
+                        me.loadSubscriberList(serviceResponse.Value);
+                    }
+                }
+            ).fail(function () {
+                  me.services.getErrorInformation();
+            }).always(function () {
+                me.refreshingSubscribers(false);
+                me.application.hideWaiter();
+            });
+
+
+        }
+
+        unsubscribe = (subscriber: IEmailSubscriber) => {
+            subscriber.unsubscribe = 1;
+            // let all = this.subscribers;
+            let page = this.listSubscribers();
+            this.unsubscribes(true);
+            this.listSubscribers([]);
+            this.listSubscribers(page);
+        }
+
+        returnToListView = () => {
+            this.subscibersVisible(false);
+        }
+
+        postUnsubscribes = () => {
+            let me = this;
+            let request = {
+                listId: me.selectedSubscriberList().id,
+                unsubscribers : []
+            }
+            me.subscribers.forEach((item) => {
+                if (item.unsubscribe == 1) {
+                    request.unsubscribers.push(item.id);
+                }
+            });
+
+            me.application.hideServiceMessages();
+            me.showLoadWaiter();
+            me.refreshingSubscribers(true);
+            me.services.executeService('peanut.contacts::messaging.PostUnsubscribes',request
+                ,function (serviceResponse: Peanut.IServiceResponse) {
+                    if (serviceResponse.Result == Peanut.serviceResultSuccess) {
+                        me.loadSubscriberList(serviceResponse.Value);
+                    }
+                }
+            ).fail(function () {
+                  me.services.getErrorInformation();
+            }).always(function () {
+                me.refreshingSubscribers(false);
+                me.application.hideWaiter();
+            });
+        }
+
+        loadSubscriberList = (subscibers) => {
+            let me = this;
+            me.subscribers = subscibers;
+            me.subscibersVisible(true);
+            me.currentSubscribersPage(1);
+            let max = Math.ceil(me.subscribers.length / me.itemsPerPage);
+            me.maxSubscriberPages(max);
+            me.onSubscribersPaged(0);
+            me.unsubscribes(false);
         }
     }
 }

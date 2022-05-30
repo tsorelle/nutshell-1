@@ -74,6 +74,9 @@ class ContactsManager
             $contactDTO->sortkey = $name;
         }
         $contact->assignFromObject($contactDTO);
+        if (empty($contact->uid)) {
+            $contact->uid = uniqid();
+        }
         if ($isNew) {
             $id = $repo->insert($contact);
         }

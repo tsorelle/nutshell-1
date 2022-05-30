@@ -8,7 +8,7 @@
 		</nutshell>
 	</about>
 	<help title="Help Pages" icon="fas fa-question-circle" description="help"/>
-	<tools title="Administration" description="Utilities for administration" icon="fas fa-cog">
+	<tools title="Tools" description="Utilities for administration" icon="fas fa-cog">
 		<tests title="Test Pages" description="Pages for testing.">
 			<simpletest title="Simple Test" description="Basic smoke test" roles="" />
 			<modaltest title="Modal Test" description="Test modal dialogs" roles="" />
@@ -24,7 +24,7 @@
 		<contacts title="Contact Management" description="Manage contacts" />
 		<email title="Email Tools" description="Mailing list management" >
 			<lists title="Lists" uri="tools/email/admin/lists" description="Email Lists and subscriptions" />
-			<send title="Send Messages" description="Mailing form" uri="tools/email/admin/messages"  />
+			<send title="Send Messages" description="Mailing form" uri="tools/email/admin/message"  />
 			<mailboxes title="Mailboxes" uri="tools/email/admin/mailboxes" description="Maintain Mailboxes" />
 			<queue title="Message Queue" uri="tools/email/admin/queue" description="Message queue" />
 		</email>

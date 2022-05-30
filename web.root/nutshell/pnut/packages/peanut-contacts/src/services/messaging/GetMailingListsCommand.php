@@ -40,7 +40,8 @@ class GetMailingListsCommand extends TServiceCommand
         $repository = new EmailListsRepository();
         $result->emailLists = $repository->getSubscriptionListLookup($this->getUser()->isAdmin());
         $result->defaultListCode = TConfiguration::getValue('defaultmailinglist','mail','meeting');
-        $result->userEmail = $this->getUser()->getEmail();
+        $email = $this->getUser()->getEmail();
+        $result->userEmail = $email ? $email : '';
         $result->translations = TLanguage::getTranslations([
             'add-new',
             'confirm-caption',

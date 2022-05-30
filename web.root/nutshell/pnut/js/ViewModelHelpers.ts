@@ -449,6 +449,11 @@ namespace Peanut {
             pos.scrollIntoView({behavior: "smooth"});
         }
 
+        public static ScrollTo(elementId: string) {
+            let pos =  document.getElementById(elementId);
+            pos.scrollIntoView({behavior: "smooth"});
+        }
+
 
     } // end class Helper
 }  // end namespace
