@@ -2,8 +2,10 @@
 
 namespace Nutshell\cms;
 
+use Peanut\PeanutTasks\TaskManager;
 use Peanut\users\AccountManager;
 use Tops\services\ServiceFactory;
+use Tops\sys\TConfiguration;
 use Tops\sys\TUser;
 
 class ServiceRequestHandler
@@ -39,6 +41,20 @@ class ServiceRequestHandler
 
     public function getSettings() {
         include(DIR_CONFIG_SITE.'/settings.php');
+    }
+
+    public function runScheduledTasks($taskId = 0) {
+        set_exception_handler('Nutshell\cms\ServiceRequestHandler::exceptionHandler');
+        (new TaskManager())->runJobs($taskId);
+        exit;
+    }
+
+    public static function exceptionHandler($ex) {
+        $msg = $ex->getMessage();
+        $content ="$msg\n\n".$ex->getTraceAsString();
+        $to = TConfiguration::getValue('notifyemail','site','webadmin@nutshell.org');
+        mail($to,'Exception in site tasks',$content);
+        exit ($msg);
     }
 
 }

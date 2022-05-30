@@ -10,9 +10,15 @@
     </div>
     <div data-bind="visible:tab()==='schedule'">
         <div class="col-md-12">
-            <p>
-                <a href="#" data-bind="click:newTask">New Task</a>
+            <div>
+
+            <p style="float:left">
+                <a href="#" style="min-width:50%" data-bind="click:newTask">New Task</a>
             </p>
+            <p style="float:right">
+                <a href="/peanut/tasks/run" class="me-5">Run all tasks now</a>
+            </p>
+            </div>
 
             <div data-bind="css: {'table-responsive':bootstrapVersion() < 4}">
                 <table class="table" data-bind="css: {'table-responsive':bootstrapVersion() > 3}">
@@ -95,7 +101,7 @@
                         <h4 class="modal-title" data-bind="visible:taskEditForm.id"><translate params="code:'tasks-form-header-edit',translator:self"></translate></h4>
                         <h4 class="modal-title" data-bind="visible:!taskEditForm.id()"><translate params="code:'tasks-form-header-new',translator:self"></translate></h4>
                         <button data-bind="visible:bootstrapVersion() > 3" type="button" class="close btn-close"
-                                data-dismiss="modal",
+                                data-dismiss="modal"
                                 data-bs-dismiss="modal"
                                 aria-label="Close">
                             <span data-bind="visible:bootstrapVersion() < 5" aria-hidden="true">&times;</span>

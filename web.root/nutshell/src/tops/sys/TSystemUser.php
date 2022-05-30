@@ -27,6 +27,7 @@ class TSystemUser implements IUser
     public function loadById($id)
     {
         // not applicable
+        return true;
     }
 
     /**
@@ -36,6 +37,7 @@ class TSystemUser implements IUser
     public function loadByUserName($userName)
     {
         $this->username = $userName;
+        return true;
     }
 
     /**
@@ -45,6 +47,7 @@ class TSystemUser implements IUser
     public function loadByEmail($email)
     {
         $this->email = $email;
+        return true;
     }
 
     /**
@@ -52,6 +55,7 @@ class TSystemUser implements IUser
      */
     public function loadCurrentUser()
     {
+        return true;
         // not applicable
     }
 
@@ -170,6 +174,7 @@ class TSystemUser implements IUser
     public function signIn($username, $password = null)
     {
         // not applicable
+        return true;
     }
 
     /**
@@ -184,5 +189,10 @@ class TSystemUser implements IUser
     public function getAccountPageUrl()
     {
         return '';
+    }
+
+    public function signOut()
+    {
+        return true;
     }
 }

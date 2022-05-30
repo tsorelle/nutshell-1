@@ -22,6 +22,7 @@
 
 		<users title="Users" description="User management" roles="administrator" />
 		<contacts title="Contact Management" description="Manage contacts" />
+		<scheduler title="Task Scheduler" description="Manage automated tasks"  />
 		<email title="Email Tools" description="Mailing list management" >
 			<lists title="Lists" uri="tools/email/admin/lists" description="Email Lists and subscriptions" />
 			<send title="Send Messages" description="Mailing form" uri="tools/email/admin/message"  />
